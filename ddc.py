@@ -12,6 +12,7 @@ Status: Frozen
 
 
 import json
+import os
 import torch
 import copy
 from typing import Dict, Tuple, List, Any
@@ -376,6 +377,7 @@ def run_sanity_tests(seed: int) -> None:
 
 
 if __name__ == "__main__":
+    os.chdir(os.path.dirname(os.path.abspath(__file__)) or '.')
     print("Running DDC Phase 0 Standard Pipeline...")
     SEED: int = 42
     
@@ -387,8 +389,9 @@ if __name__ == "__main__":
     
     print("\n--- Multi-cell Dataset ---")
     M_cells: int = 100
-    dataset, world = generate_dataset(SEED, M_cells)
-    print(f'Dataset generated successfully: {dataset.shape}')
+    multi_cell_sim_path = './multi_cell_trajectory.pt'
+    dataset, world = generate_dataset(SEED, M_cells, save_path=multi_cell_sim_path)
+    print(f'Dataset generated successfully: {dataset.shape}, data saved to {multi_cell_sim_path}')
 
     print('Start simulation')
     result_dict = run_simulation(SEED, save_path='./trajectory.pt')
