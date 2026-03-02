@@ -269,7 +269,7 @@ def run_simulation(seed: int, save_path: str = None) -> Dict[str, Tensor]:
 
     return traj
 
-def generate_dataset(world_seed: int, M: int, save_path: str = './dataset.pt') -> Tuple[Tensor, World]:
+def generate_dataset(world_seed: int, M: int, save_path: str = './data/dataset.pt') -> Tuple[Tensor, World]:
     world: World = sample_world(world_seed)
     C: Tensor = torch.zeros((M, G), dtype=DTYPE)
 
@@ -378,6 +378,7 @@ def run_sanity_tests(seed: int) -> None:
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(__file__)) or '.')
+    os.makedirs('./data', exist_ok=True)
     print("Running DDC Phase 0 Standard Pipeline...")
     SEED: int = 42
     
@@ -387,12 +388,13 @@ if __name__ == "__main__":
     print("\n--- T=200 Stability Test ---")
     run_sanity_tests(SEED)
     
-    print("\n--- Multi-cell Dataset ---")
+    print(f"\n--- Multi-cell Dataset, random seed: {SEED} ---")
     M_cells: int = 100
-    multi_cell_sim_path = './multi_cell_trajectory.pt'
+    multi_cell_sim_path = './data/multi_cell_trajectory.pt'
     dataset, world = generate_dataset(SEED, M_cells, save_path=multi_cell_sim_path)
     print(f'Dataset generated successfully: {dataset.shape}, data saved to {multi_cell_sim_path}')
 
-    print('Start simulation')
-    result_dict = run_simulation(SEED, save_path='./trajectory.pt')
-    print(f'Simulation completed. Trajectory saved to ./trajectory.pt')
+    print(f'\n--- Single-cell Dataset, random seed: {SEED} ---')
+    sim_path = './data/trajectory.pt'
+    result_dict = run_simulation(SEED, save_path=sim_path)
+    print(f'Simulation completed. Trajectory saved to {sim_path}')
