@@ -68,25 +68,41 @@ update_fate: N' = N + r·N·(1-N/K_pop)
 X(t+1), P(t+1), Z(t+1), N(t+1)
 ```
 
-## Environment Requirements
+## Model Parameters
 
-- **Python**: 3.8+
-- **PyTorch**: 1.9.0+ (tested with 2.10.0)
-- **NumPy**: 1.20.0+ (tested with 1.23.5)
+### Gene-level Parameters
 
-## Installation
+| Parameter | Symbol | Distribution/Value | Description |
+|-----------|--------|-------------------|-------------|
+| **alpha** | α | N(0, 1) | Basal chromatin activation |
+| **rho** | ρ | U(0.5, 2.0) | mRNA production rate |
+| **K** | K | U(0.1, 1.0) | Hill coefficient denominator |
+| **n** | n | 2.0 (fixed) | Hill coefficient |
+| **delta_x** | δₓ | U(0.1, 0.5) | mRNA degradation rate |
+| **delta_p** | δₚ | U(0.05, 0.3) | Protein degradation rate |
+| **gamma** | γ | 1.0 (fixed) | Translation rate |
 
-```bash
-pip install torch numpy
-```
+### Edge-level Parameters
 
-Or clone and install in development mode:
+| Parameter | Symbol | Distribution | Description |
+|-----------|--------|--------------|-------------|
+| **a_ij** | aᵢⱼ | U(0.5, 2.0) | TF regulatory strength |
+| **beta_ij** | βᵢⱼ | N(0, 1.5) | Epigenetic regulatory strength |
 
-```bash
-git clone https://github.com/HuanlinZhang/ddc.git
-cd ddc
-pip install -e .
-```
+### Run-level Parameters
+
+| Parameter | Symbol | Distribution/Value | Description |
+|-----------|--------|-------------------|-------------|
+| **r** | r | U(0.05, 0.2) | Cell growth rate |
+| **K_pop** | K_pop | 1.0 (fixed) | Carrying capacity |
+| **R_total** | R_total | 1.0 (fixed) | Total protein resource |
+
+### Network Topology
+
+| Graph | Source | Target | Degree |
+|-------|--------|--------|--------|
+| **P_graph** | TF (0-5) | All genes (≠ source) | 1-3 per gene |
+| **E_graph** | EPI (17-19) | All genes | 2 per gene |
 
 ## Core Functions
 
@@ -96,7 +112,19 @@ pip install -e .
 def sample_world(seed: int) -> World
 ```
 
-Generate a random gene network world.
+Generate a random gene network world with all parameters sampled from the distributions defined above. The world contains:
+- Gene-level parameters (alpha, rho, K, n, delta_x, delta_p, gamma)
+- Edge-level parameters (a_ij, beta_ij)
+- Network topology (P_graph, E_graph)
+
+### to_dict / from_dict
+
+```python
+def to_dict(self) -> Dict[str, Any]
+def from_dict(self, data: Dict[str, Any]) -> None
+```
+
+Serialize/deserialize World object for reproducibility. Includes all graph adjacency lists, parameter arrays, and random seed.
 
 ### simulate_single_cell
 
@@ -111,21 +139,43 @@ def simulate_single_cell(
 ) -> Dict[str, Tensor]
 ```
 
-Simulate single cell time evolution. Returns:
-- `X_traj`: (t_steps+1, G)
-- `P_traj`: (t_steps+1, G)
-- `Z_traj`: (t_steps+1, G)
-- `N_traj`: (t_steps+1,)
+Simulate single cell time evolution from initial state to t_steps. Returns:
+- `X_traj`: Tensor of shape (t_steps+1, G) - mRNA trajectories
+- `P_traj`: Tensor of shape (t_steps+1, G) - protein trajectories
+- `Z_traj`: Tensor of shape (t_steps+1, G) - chromatin state trajectories
+- `N_traj`: Tensor of shape (t_steps+1,) - cell count trajectory
+
+Convention: index 0 stores initial state at t=0.
+
+### sample_initial_state
+
+```python
+def sample_initial_state(cell_seed: int, world: World) -> Tuple[Tensor, Tensor, Tensor, float]
+```
+
+Sample initial state for a single cell:
+- X0 ~ U(0, 1) - random initial mRNA
+- P0 = gamma * X0 with resource projection
+- Z0 = sigmoid(alpha) - chromatin initial state
+- N0 = 1.0 - initial cell count
 
 ### generate_dataset
 
 ```python
-def generate_dataset(world_seed: int, M: int) -> Tuple[Tensor, World]
+def generate_dataset(
+    world_seed: int,
+    M: int,
+    save_path: str = './dataset.pt'
+) -> Tuple[Tensor, World]
 ```
 
-Generate multi-cell dataset. Returns:
-- Expression matrix: (M, G)
+Generate multi-cell dataset with M cells from the same world. Returns:
+- Expression matrix: Tensor of shape (M, G)
 - World object
+
+Data is automatically saved to `save_path` (default: './dataset.pt') containing:
+- `expression`: Expression matrix (M, G)
+- `world`: Serialized World object
 
 ### apply_perturbation
 
@@ -137,12 +187,40 @@ def apply_perturbation(
 ) -> Tuple[World, State]
 ```
 
-Apply gene perturbation. Config options:
-- `knockout`: List of gene indices
-- `override_rho`: Dict {gene: value}
-- `override_a_ij`: List of (from, to, value)
-- `override_alpha`: Dict {gene: value}
-- `R_total`: float
+Apply gene perturbation to world and state. Config options:
+- `knockout`: List of gene indices to knock out (set X=0)
+- `override_rho`: Dict {gene_index: value} - override mRNA production rate
+- `override_a_ij`: List of (from, to, value) - override TF regulatory strength
+- `override_alpha`: Dict {gene_index: value} - override basal chromatin activation
+- `R_total`: float - override total protein resource
+
+### run_simulation
+
+```python
+def run_simulation(seed: int) -> Dict[str, Tensor]
+```
+
+Convenience function: run full simulation with world_seed=seed, cell_seed=seed+1.
+
+### run_smoke_test
+
+```python
+def run_smoke_test(seed: int, T: int = 10) -> Dict[str, Tensor]
+```
+
+Quick sanity check with T time steps. Tests basic functionality.
+
+### run_sanity_tests
+
+```python
+def run_sanity_tests(seed: int) -> None
+```
+
+Comprehensive sanity tests:
+1. Reproducibility: same seed produces identical results
+2. Non-negativity: X, P >= 0, Z in [0, 1]
+3. Resource bound: sum(P) <= R_total
+4. Stability: all values finite for T=200
 
 ## Quick Start
 
