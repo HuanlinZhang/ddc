@@ -101,7 +101,7 @@ X(t+1), P(t+1), Z(t+1), N(t+1)
 
 | Graph | Source | Target | Degree |
 |-------|--------|--------|--------|
-| **P_graph** | TF (0-5) | All genes (≠ source) | 1-3 per gene |
+| **P_graph** | TF (0-5) | All genes (≠ itself) | 1-3 per gene |
 | **E_graph** | EPI (17-19) | All genes | 2 per gene |
 
 ## Core Functions
@@ -165,16 +165,35 @@ Sample initial state for a single cell:
 def generate_dataset(
     world_seed: int,
     M: int,
-    save_path: str = './dataset.pt'
+    save_path: str = './data/dataset.pt'
 ) -> Tuple[Tensor, World]
 ```
 
-Generate multi-cell dataset with M cells from the same world. Returns:
+Generate multi-cell dataset. Returns:
 - Expression matrix: Tensor of shape (M, G)
 - World object
 
-Data is automatically saved to `save_path` (default: './dataset.pt') containing:
+Data is automatically saved to `save_path` containing:
 - `expression`: Expression matrix (M, G)
+- `world`: Serialized World object
+
+### run_simulation
+
+```python
+def run_simulation(
+    seed: int,
+    save_path: str = None
+) -> Dict[str, Tensor]
+```
+
+Run single-cell simulation. Returns:
+- `X_traj`: Tensor of shape (T+1, G) - mRNA trajectory
+- `P_traj`: Tensor of shape (T+1, G) - protein trajectory
+- `Z_traj`: Tensor of shape (T+1, G) - chromatin state trajectory
+- `N_traj`: Tensor of shape (T+1,) - cell count trajectory
+
+When `save_path` is provided, data is automatically saved containing:
+- `X_traj`, `P_traj`, `Z_traj`, `N_traj`: Trajectory tensors
 - `world`: Serialized World object
 
 ### apply_perturbation
@@ -187,20 +206,12 @@ def apply_perturbation(
 ) -> Tuple[World, State]
 ```
 
-Apply gene perturbation to world and state. Config options:
-- `knockout`: List of gene indices to knock out (set X=0)
-- `override_rho`: Dict {gene_index: value} - override mRNA production rate
-- `override_a_ij`: List of (from, to, value) - override TF regulatory strength
-- `override_alpha`: Dict {gene_index: value} - override basal chromatin activation
-- `R_total`: float - override total protein resource
-
-### run_simulation
-
-```python
-def run_simulation(seed: int) -> Dict[str, Tensor]
-```
-
-Convenience function: run full simulation with world_seed=seed, cell_seed=seed+1.
+Apply gene perturbation. Config options:
+- `knockout`: List of gene indices
+- `override_rho`: Dict {gene: value}
+- `override_a_ij`: List of (from, to, value)
+- `override_alpha`: Dict {gene: value}
+- `R_total`: float
 
 ### run_smoke_test
 
