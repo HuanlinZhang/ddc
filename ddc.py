@@ -248,14 +248,25 @@ def sample_initial_state(cell_seed: int, world: World) -> Tuple[Tensor, Tensor, 
 
     return X0, P0, Z0, N0
 
-def run_simulation(seed: int) -> Dict[str, Tensor]:
+def run_simulation(seed: int, save_path: str = None) -> Dict[str, Tensor]:
     world_seed: int = seed
     cell_seed: int = seed + 1
 
     world: World = sample_world(world_seed)
     X0, P0, Z0, N0 = sample_initial_state(cell_seed, world)
 
-    return simulate_single_cell(world, X0, P0, Z0, N0, T)
+    traj: Dict[str, Tensor] = simulate_single_cell(world, X0, P0, Z0, N0, T)
+
+    if save_path is not None:
+        torch.save({
+            'X_traj': traj['X_traj'],
+            'P_traj': traj['P_traj'],
+            'Z_traj': traj['Z_traj'],
+            'N_traj': traj['N_traj'],
+            'world': world.to_dict(),
+        }, save_path)
+
+    return traj
 
 def generate_dataset(world_seed: int, M: int, save_path: str = './dataset.pt') -> Tuple[Tensor, World]:
     world: World = sample_world(world_seed)
@@ -378,3 +389,7 @@ if __name__ == "__main__":
     M_cells: int = 100
     dataset, world = generate_dataset(SEED, M_cells)
     print(f'Dataset generated successfully: {dataset.shape}')
+
+    print('Start simulation')
+    result_dict = run_simulation(SEED, save_path='./trajectory.pt')
+    print(f'Simulation completed. Trajectory saved to ./trajectory.pt')
