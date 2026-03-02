@@ -157,9 +157,3 @@ result = run_simulation(seed=42)
 | Version | Date | Description |
 |---------|------|-------------|
 | v1.0 | 2026-03-02 | Initial release, Phase 0 spec |
-
-## Contact
-
-- Author: zhanghl
-- Email: 945383325@qq.com
-- Repository: https://github.com/HuanlinZhang/ddc
