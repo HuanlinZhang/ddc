@@ -165,7 +165,7 @@ Sample initial state for a single cell:
 def generate_dataset(
     world_seed: int,
     M: int,
-    save_path: str = './data/dataset.pt'
+    save_path: str = None
 ) -> Tuple[Tensor, World]
 ```
 
@@ -173,7 +173,7 @@ Generate multi-cell dataset. Returns:
 - Expression matrix: Tensor of shape (M, G)
 - World object
 
-Data is automatically saved to `save_path` containing:
+When `save_path` is provided, data is automatically saved to `save_path` containing:
 - `expression`: Expression matrix (M, G)
 - `world`: Serialized World object
 
