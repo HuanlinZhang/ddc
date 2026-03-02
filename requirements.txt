@@ -1,0 +1,11 @@
+# DDC (Designed Digital Cell) Dependencies
+# Python 3.8+ required
+
+# Core dependencies
+torch>=1.9.0
+numpy>=1.20.0
+
+# The project uses only these dependencies from the standard library:
+# - json (built-in)
+# - copy (built-in)
+# - typing (built-in)
