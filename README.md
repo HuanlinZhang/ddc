@@ -165,7 +165,7 @@ Sample initial state for a single cell:
 def generate_dataset(
     world_seed: int,
     M: int,
-    save_path: str = None
+    save_path: str
 ) -> Tuple[Tensor, World]
 ```
 
@@ -182,7 +182,7 @@ When `save_path` is provided, data is automatically saved to `save_path` contain
 ```python
 def run_simulation(
     seed: int,
-    save_path: str = None
+    save_path: str
 ) -> Dict[str, Tensor]
 ```
 
