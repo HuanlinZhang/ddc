@@ -71,7 +71,6 @@ class World():
         self.epsilon: float = EPSILON
     
     def to_dict(self) -> Dict[str, Any]:
-        # Convert tensors to lists for JSON serialization
         return {
             'seed': self.seed,
             'P_graph': self.P_graph,
@@ -93,8 +92,7 @@ class World():
             }
         }
 
-    def from_dict(cls, data: Dict[str, Any]) -> None:
-        # Load world state from dictionary
+    def from_dict(self, data: Dict[str, Any]) -> None:
         self.seed = data['seed']
         
         self.P_graph = {int(k): v for k, v in data['P_graph'].items()}
@@ -109,7 +107,6 @@ class World():
         self.delta_p = torch.tensor(params['delta_p'], dtype=DTYPE)
         self.gamma = torch.tensor(params['gamma'], dtype=DTYPE)
 
-        # e.q.: {"0": {"1": 0.5, "2": 1.2}, "1": {...}} -> {0: {1: 0.5, 2: 1.2}, 1: {...}}
         self.a_ij = {int(k): {int(sub_k): float(sub_v) for sub_k, sub_v in v.items()}
                      for k, v in params['a_ij'].items()}
         self.beta_ij = {int(k): {int(sub_k): float(sub_v) for sub_k, sub_v in v.items()}
@@ -119,8 +116,6 @@ class World():
         self.K_pop = params['K_pop']
         self.R_total = params['R_total']
         self.epsilon = params['epsilon']
-
-        return world
 
 # ==========================================
 # Monte Carlo World Sampler
@@ -141,7 +136,6 @@ def sample_world(seed: int) -> World:
     world.r = float(torch.empty(1, dtype=DTYPE).uniform_(0.05, 0.2, generator=rng).item())
     
     for i in range(G):
-        # Transcription Graph P(i)
         d_i: int = int(torch.randint(1, 4, (1,), generator=rng).item())
         tf_pool: Tensor = torch.tensor([tf for tf in TF_GENES if tf != i], dtype=torch.int64)
         idx: Tensor = torch.randperm(len(tf_pool), generator=rng)[:d_i]
@@ -152,7 +146,6 @@ def sample_world(seed: int) -> World:
         for j in p_nodes:
             world.a_ij[i][j] = torch.empty(1, dtype=DTYPE).uniform_(0.5, 2.0, generator=rng).item()
 
-        # Chromatin Graph E(i)
         epi_pool: Tensor = torch.tensor(EPI_GENES, dtype=torch.int64)
         idx_e: Tensor = torch.randperm(len(epi_pool), generator=rng)[:2]
         e_nodes: List[int] = epi_pool[idx_e].tolist()
@@ -255,7 +248,7 @@ def sample_initial_state(cell_seed: int, world: World) -> Tuple[Tensor, Tensor, 
 
     return X0, P0, Z0, N0
 
-def run_simulation(seed: int):
+def run_simulation(seed: int) -> Dict[str, Tensor]:
     world_seed: int = seed
     cell_seed: int = seed + 1
 
@@ -264,7 +257,7 @@ def run_simulation(seed: int):
 
     return simulate_single_cell(world, X0, P0, Z0, N0, T)
 
-def generate_dataset(world_seed: int, M: int) -> Tuple[Tensor, World]:
+def generate_dataset(world_seed: int, M: int, save_path: str = './dataset.pt') -> Tuple[Tensor, World]:
     world: World = sample_world(world_seed)
     C: Tensor = torch.zeros((M, G), dtype=DTYPE)
 
@@ -273,6 +266,12 @@ def generate_dataset(world_seed: int, M: int) -> Tuple[Tensor, World]:
         X0, P0, Z0, N0 = sample_initial_state(cell_seed_c, world)
         traj: Dict[str, Tensor] = simulate_single_cell(world, X0, P0, Z0, N0, T)
         C[c, :] = traj['X_traj'][T, :]
+
+    if save_path is not None:
+        torch.save({
+            'expression': C,
+            'world': world.to_dict(),
+        }, save_path)
 
     return C, world
 
@@ -377,5 +376,5 @@ if __name__ == "__main__":
     
     print("\n--- Multi-cell Dataset ---")
     M_cells: int = 100
-    dataset, _ = generate_dataset(SEED, M_cells)
+    dataset, world = generate_dataset(SEED, M_cells)
     print(f'Dataset generated successfully: {dataset.shape}')
