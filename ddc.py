@@ -9,8 +9,6 @@ Author: zhanghl
 Version: v1.0
 Status: Frozen
 """
-
-
 import json
 import os
 import torch
@@ -33,6 +31,43 @@ State = Dict[str, Any]
 # Gene Categories Indices
 TF_GENES: List[int] = list(range(0, 6))
 EPI_GENES: List[int] = list(range(17, 20))
+
+### 0304 ADD: Other Gene Categories Indices
+RBP_GENES: List[int] = list(range(6, 11))
+KINASE_GENES: List[int] = list(range(11, 14))
+PHOSPHATASE_GENES: List[int] = list(range(14, 17))
+
+CELL_CYCLE_GENES: List[int] = list(range(20, 23))
+APOPTOSIS_GENES: List[int] = list(range(23, 26))
+
+BACKGROUND_GENES: List[int] = list(range(26, 50))
+
+GENE_CATEGORIES: Dict[str, Dict[str, list[int]]] = {
+    "Core Regulatory": {
+        "TF": TF_GENES,
+        "RBP": RBP_GENES,
+        "Kinase": KINASE_GENES,
+        "Phosphatase": PHOSPHATASE_GENES,
+        "Epigenetic": EPI_GENES
+    },
+    "Cell Fate": {
+        "Cell Cycle": CELL_CYCLE_GENES,
+        "Apoptosis": APOPTOSIS_GENES
+    },
+    "Background": {
+        "Background": BACKGROUND_GENES
+    }
+}
+
+# reverse mapping dictionary for plotting
+GENE_TO_MACRO: Dict[int, str] = {}
+GENE_TO_MICRO: Dict[int, str] = {}
+for macro, micro_dict in GENE_CATEGORIES.items():
+    for micro, gene_list in micro_dict.items():
+        for g in gene_list:
+            GENE_TO_MACRO[g] = macro
+            GENE_TO_MICRO[g] = micro
+### 0304 ADD END
 
 def stable_sigmoid(x: Tensor) -> Tensor:
     return torch.where(x >= 0,
@@ -70,8 +105,15 @@ class World():
         # Global constants
         self.R_total: float = R_TOTAL
         self.epsilon: float = EPSILON
+
+        ### 0304 ADD
+        self.gene_categories: Dict[str, Dict[str, list[int]]] = GENE_CATEGORIES
+        self.gene_to_macro: Dict[int, str] = GENE_TO_MACRO
+        self.gene_to_micro: Dict[int, str] = GENE_TO_MICRO
+        ###
     
     def to_dict(self) -> Dict[str, Any]:
+        # Convert tensors to lists for JSON serialization
         return {
             'seed': self.seed,
             'P_graph': self.P_graph,
@@ -90,7 +132,14 @@ class World():
                 'K_pop': self.K_pop,
                 'R_total': self.R_total,
                 'epsilon': self.epsilon,
+            },
+            ### 0304 ADD
+            'gene_annotation': {
+                'category': self.gene_categories,
+                'to_macro': self.gene_to_macro,
+                'to_micro': self.gene_to_micro
             }
+            ###
         }
 
     def from_dict(self, data: Dict[str, Any]) -> None:
@@ -118,6 +167,12 @@ class World():
         self.R_total = params['R_total']
         self.epsilon = params['epsilon']
 
+        ### 0304 ADD
+        self.gene_categories = data['gene_annotation']['category']
+        self.gene_to_macro = {int(k): v for k, v in data['gene_annotation']['to_macro'].items()}
+        self.gene_to_micro = {int(k): v for k, v in data['gene_annotation']['to_micro'].items()}
+        ###
+
 # ==========================================
 # Monte Carlo World Sampler
 # ==========================================
@@ -137,6 +192,7 @@ def sample_world(seed: int) -> World:
     world.r = float(torch.empty(1, dtype=DTYPE).uniform_(0.05, 0.2, generator=rng).item())
     
     for i in range(G):
+        # Transcription Graph P(i)
         d_i: int = int(torch.randint(1, 4, (1,), generator=rng).item())
         tf_pool: Tensor = torch.tensor([tf for tf in TF_GENES if tf != i], dtype=torch.int64)
         idx: Tensor = torch.randperm(len(tf_pool), generator=rng)[:d_i]
@@ -147,6 +203,7 @@ def sample_world(seed: int) -> World:
         for j in p_nodes:
             world.a_ij[i][j] = torch.empty(1, dtype=DTYPE).uniform_(0.5, 2.0, generator=rng).item()
 
+        # Chromatin Graph E(i)
         epi_pool: Tensor = torch.tensor(EPI_GENES, dtype=torch.int64)
         idx_e: Tensor = torch.randperm(len(epi_pool), generator=rng)[:2]
         e_nodes: List[int] = epi_pool[idx_e].tolist()
@@ -228,7 +285,7 @@ def simulate_single_cell(world: World, X0: Tensor, P0: Tensor, Z0: Tensor, N0: f
         X_next: Tensor = update_mRNA(X, Z, TFinput, world)
         P_raw: Tensor = update_protein_raw(P, X, world)
         P_next: Tensor = apply_resource_projection(P_raw, world)
-        N_next: Tensor = update_fate(N, world)
+        N_next: float = update_fate(N, world)
 
         X, P, Z, N = X_next, P_next, Z_next, N_next
         X_traj[t+1], P_traj[t+1], Z_traj[t+1], N_traj[t+1] = X, P, Z, N
@@ -269,7 +326,7 @@ def run_simulation(seed: int, save_path: str = None) -> Dict[str, Tensor]:
 
     return traj
 
-def generate_dataset(world_seed: int, M: int, save_path: str = './data/dataset.pt') -> Tuple[Tensor, World]:
+def generate_dataset(world_seed: int, M: int, save_path: str = None) -> Tuple[Tensor, World]:
     world: World = sample_world(world_seed)
     C: Tensor = torch.zeros((M, G), dtype=DTYPE)
 
@@ -391,10 +448,10 @@ if __name__ == "__main__":
     print(f"\n--- Multi-cell Dataset, random seed: {SEED} ---")
     M_cells: int = 100
     multi_cell_sim_path = './data/multi_cell_trajectory.pt'
-    dataset, world = generate_dataset(SEED, M_cells, save_path=multi_cell_sim_path)
+    dataset, world = generate_dataset(SEED, M_cells, save_path = multi_cell_sim_path)
     print(f'Dataset generated successfully: {dataset.shape}, data saved to {multi_cell_sim_path}')
 
     print(f'\n--- Single-cell Dataset, random seed: {SEED} ---')
     sim_path = './data/trajectory.pt'
-    result_dict = run_simulation(SEED, save_path=sim_path)
+    result_dict = run_simulation(SEED, save_path = sim_path)
     print(f'Simulation completed. Trajectory saved to {sim_path}')
