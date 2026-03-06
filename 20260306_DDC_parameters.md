@@ -1,6 +1,6 @@
 # DDC 参数手册
 
-本文档分类整理了 DDC (Designed Digital Cell) 模型中的全部参数。
+本文档分类整理了 DDC (Designed Digital Cell) 模型中的全部参数及其分布情况。
 
 ---
 
@@ -60,12 +60,12 @@
 
 ### 3.2 边级参数 (Edge-level Parameters)
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `P_graph` | `Dict[int, List[int]]` | 转录调控图：P_graph[i] = 受基因 i 调控的上游 TF 列表 |
-| `a_ij` | `Dict[int, Dict[int, float]]` | 转录调控强度：a_ij[i][j] = 基因 j 对基因 i 的调控系数 |
-| `E_graph` | `Dict[int, List[int]]` | 染色质调控图：E_graph[i] = 影响基因 i 的表观基因列表 |
-| `beta_ij` | `Dict[int, Dict[int, float]]` | 染色质调控强度：beta_ij[i][j] = 表观基因 j 对基因 i 的调控系数 |
+| 参数 | 类型 | 维度 | 分布/取值 | 说明 |
+|------|------|------|-----------|------|
+| `P_graph` | `Dict[int, List[int]]` | - | 每个基因 i 连接 1-3 个 TF | 转录调控图：P_graph[i] = 受基因 i 调控的上游 TF 列表 |
+| `a_ij` | `Dict[int, Dict[int, float]]` | - | `U(0.5, 2.0)` | 转录调控强度：基因 j 对基因 i 的调控系数 |
+| `E_graph` | `Dict[int, List[int]]` | - | 每个基因 i 连接 2 个表观基因 | 染色质调控图：E_graph[i] = 影响基因 i 的表观基因列表 |
+| `beta_ij` | `Dict[int, Dict[int, float]]` | - | `N(0, 1.5)` | 染色质调控强度：表观基因 j 对基因 i 的调控系数 |
 
 ### 3.3 运行级参数 (Run-level Parameters)
 
@@ -93,7 +93,7 @@
 
 ## 4. 状态变量 (State Variables)
 
-在 `simulate_single_cell` 中，每个时间步包含以下状态：
+在模拟过程中，每个时间步包含以下状态：
 
 | 变量 | 类型 | 形状 | 说明 |
 |------|------|------|------|
@@ -112,97 +112,6 @@
 | `P_traj` | `Tensor` | (T+1, G) | 蛋白轨迹 |
 | `Z_traj` | `Tensor` | (T+1, G) | 染色质状态轨迹 |
 | `N_traj` | `Tensor` | (T+1,) | 群体状态轨迹 |
-
----
-
-## 6. 核心函数参数 (Core Function Parameters)
-
-### 6.1 `sample_world(seed: int) -> World`
-
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `seed` | `int` | 随机种子，用于生成确定性的基因调控网络 |
-
-### 6.2 `simulate_single_cell(world, X0, P0, Z0, N0, t_steps) -> Dict`
-
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `world` | `World` | 基因网络世界对象 |
-| `X0` | `Tensor` | 初始 mRNA 状态 |
-| `P0` | `Tensor` | 初始蛋白状态 |
-| `Z0` | `Tensor` | 初始染色质状态 |
-| `N0` | `float` | 初始群体状态 |
-| `t_steps` | `int` | 模拟时间步数（默认 T=200） |
-
-### 6.3 `run_simulation(seed: int, save_path: str = None) -> Dict`
-
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `seed` | `int` | 随机种子 |
-| `save_path` | `str` | 可选，轨迹数据保存路径 |
-
-### 6.4 `generate_dataset(world_seed: int, M: int, save_path: str = None) -> Tuple[Tensor, World]`
-
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `world_seed` | `int` | 基因网络随机种子 |
-| `M` | `int` | 生成的单细胞数量 |
-| `save_path` | `str` | 可选，数据集保存路径 |
-
-**返回值**:
-- `Tensor`: 表达矩阵，形状 (M, G)
-- `World`: 基因网络对象
-
-### 6.5 `apply_perturbation(world, state, config) -> Tuple[World, State]`
-
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `world` | `World` | 原始基因网络 |
-| `state` | `Dict` | 原始状态，包含 X/P/Z/N |
-| `config` | `Dict` | 扰动配置 |
-
-**扰动配置选项**:
-- `'knockout'`: `List[int]` - 要敲除的基因索引列表
-- `'override_rho'`: `Dict[int, float]` - 要覆盖的 rho 值
-- `'override_a_ij'`: `List[Tuple[int, int, float]]` - 要覆盖的 a_ij 值
-- `'override_alpha'`: `Dict[int, float]` - 要覆盖的 alpha 值
-- `'R_total'`: `float` - 新的蛋白质资源总量
-
----
-
-## 7. 关键公式汇总
-
-### 7.1 蛋白归一化 (v1.1 修改)
-```
-tilde_P = P / (mean(P) + ε)
-```
-
-### 7.2 TF 输入计算
-```
-TF_input_i = (∏_{j∈P(i)} tilde_P_j^{a_ij[i][j]})^{1/|P(i)|}
-```
-
-### 7.3 染色质状态更新
-```
-Z_i = sigmoid(alpha_i + Σ_{j∈E(i)} beta_ij[i][j] * tilde_P_j)
-```
-
-### 7.4 mRNA 更新
-```
-hill = TF_input^n / (K^n + TF_input^n)
-X_next = (1 - δ_x) * X + Z * rho * hill
-```
-
-### 7.5 蛋白更新 + 资源投影
-```
-P_raw = (1 - δ_p) * P + gamma * X
-P_next = P_raw * min(1, R_total / sum(P_raw))
-```
-
-### 7.6 群体动态
-```
-N_next = N + r * N * (1 - N / K_pop)
-```
 
 ---
 
