@@ -6,8 +6,26 @@ A computational simulation framework for gene regulatory network dynamics.
 Based on the Phase 0 specification documents.
 
 Author: zhanghl
-Version: v1.0
-Status: Frozen
+Version: v1.1
+Status: Active
+
+================================================================================
+Version History & Update Notes
+================================================================================
+
+v1.1 (2026-03-06):
+    - Modified normalize_protein() function: changed protein normalization
+      from sum-based to mean-based calculation
+    - Previous:  tilde_P = P / (torch.sum(P) + epsilon)
+    - Current:   tilde_P = P / (torch.mean(P) + epsilon)
+    - Reason:    To address data decay issue where X/P values rapidly approach
+      zero. The mean-based normalization compensates for the signal dilution
+      effect caused by network scale (G=50 genes), allowing TF input to
+      cross Hill function activation threshold.
+
+v1.0 (2026-03-03):
+    - Initial release
+    - Status: Frozen
 """
 import json
 import os
