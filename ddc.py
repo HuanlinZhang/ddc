@@ -21,6 +21,9 @@ from typing import Dict, Tuple, List, Any
 G: int = 50
 T: int = 200
 R_TOTAL: float = 1.0
+# ### 0305 方案2：增大R_total，其余不变
+# R_TOTAL: float = 25.0
+# ### 经测试，无效果
 EPSILON: float = 1e-8
 K_POP: float = 1.0
 DTYPE: torch.dtype = torch.float64
@@ -185,6 +188,9 @@ def sample_world(seed: int) -> World:
     world.alpha = torch.empty(G, dtype=DTYPE).normal_(0, 1, generator=rng)
     world.rho = torch.empty(G, dtype=DTYPE).uniform_(0.5, 2.0, generator=rng)
     world.K = torch.empty(G, dtype=DTYPE).uniform_(0.1, 1.0, generator=rng)
+    # ### 0305 adjust K to prevent X, P from decreasing too fast 
+    # world.K = torch.empty(G, dtype=DTYPE).uniform_(0.01, 0.1, generator=rng)
+    # ###
     world.n = torch.full((G,), 2.0, dtype=DTYPE)
     world.delta_x = torch.empty(G, dtype=DTYPE).uniform_(0.1, 0.5, generator=rng)
     world.delta_p = torch.empty(G, dtype=DTYPE).uniform_(0.05, 0.3, generator=rng)
@@ -219,7 +225,11 @@ def sample_world(seed: int) -> World:
 # Module Interface Contracts
 # ==========================================
 def normalize_protein(P: Tensor, world: World) -> Tensor:
-    return P / (torch.sum(P) + world.epsilon)
+    # return P / (torch.sum(P) + world.epsilon)
+    ### 0305 方案3：思路与方案1相同，但改为在生成tilde_P就乘G
+    ### 以便update_chromatin时避免尺度失衡
+    return P / (torch.mean(P) + world.epsilon)
+    ### 采用此方案
 
 def compute_TFinput(tilde_P: Tensor, world: World) -> Tensor:
     TFinput: Tensor = torch.zeros(G, dtype=DTYPE)
@@ -227,6 +237,10 @@ def compute_TFinput(tilde_P: Tensor, world: World) -> Tensor:
         d_i = len(world.P_graph[i])
         prod = 1.0
         for j in world.P_graph[i]:
+            # ### 0305 方案1：乘以 G，将均值拉回 1.0 附近，抵消网络规模带来的稀释，其余不变
+            # scaled_P = tilde_P[j] * G
+            # prod *= (scaled_P ** world.a_ij[i][j])
+            # ### 这样会使下游的Z计算受影响，导致Z几乎不变，故弃用
             prod *= (tilde_P[j] ** world.a_ij[i][j])
         TFinput[i] = prod ** (1.0 / d_i)
     return TFinput
@@ -241,6 +255,10 @@ def update_chromatin(tilde_P: Tensor, world: World) -> Tensor:
 def update_mRNA(X: Tensor, Z: Tensor, TFinput: Tensor, world: World) -> Tensor:
     hill_term = (TFinput ** world.n) / (world.K ** world.n + TFinput ** world.n)
     X_next = (1.0 - world.delta_x) * X + Z * world.rho * hill_term
+
+    ### 0305 ADD
+    print(f'Hill term avg: {hill_term.mean().item()}')
+    ###
     return X_next
 
 def update_protein_raw(P: Tensor, X: Tensor, world: World) -> Tensor:
@@ -442,16 +460,16 @@ if __name__ == "__main__":
     print("\n--- T=10 Smoke Test ---")
     run_smoke_test(SEED, T=10)
     
-    print("\n--- T=200 Stability Test ---")
-    run_sanity_tests(SEED)
+    # print("\n--- T=200 Stability Test ---")
+    # run_sanity_tests(SEED)
     
-    print(f"\n--- Multi-cell Dataset, random seed: {SEED} ---")
-    M_cells: int = 100
-    multi_cell_sim_path = './data/multi_cell_trajectory.pt'
-    dataset, world = generate_dataset(SEED, M_cells, save_path = multi_cell_sim_path)
-    print(f'Dataset generated successfully: {dataset.shape}, data saved to {multi_cell_sim_path}')
+    # print(f"\n--- Multi-cell Dataset, random seed: {SEED} ---")
+    # M_cells: int = 100
+    # multi_cell_sim_path = './data/multi_cell_trajectory.pt'
+    # dataset, world = generate_dataset(SEED, M_cells, save_path = multi_cell_sim_path)
+    # print(f'Dataset generated successfully: {dataset.shape}, data saved to {multi_cell_sim_path}')
 
-    print(f'\n--- Single-cell Dataset, random seed: {SEED} ---')
-    sim_path = './data/trajectory.pt'
-    result_dict = run_simulation(SEED, save_path = sim_path)
-    print(f'Simulation completed. Trajectory saved to {sim_path}')
+    # print(f'\n--- Single-cell Dataset, random seed: {SEED} ---')
+    # sim_path = './data/trajectory.pt'
+    # result_dict = run_simulation(SEED, save_path = sim_path)
+    # print(f'Simulation completed. Trajectory saved to {sim_path}')
