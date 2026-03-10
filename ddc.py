@@ -6,14 +6,27 @@ A computational simulation framework for gene regulatory network dynamics.
 Based on the Phase 0 specification documents.
 
 Author: zhanghl
-Version: v1.1
+Version: v1.1.1
 Status: Active
 
 ================================================================================
 Version History & Update Notes
 ================================================================================
 
-v1.1 (2026-03-06):
+Note: v1.1.0 and v1.1.1 are parallel branches, each modifying only the stated
+change on top of v1.0. All other code remains identical to v1.0.
+
+v1.1.1 (2026-03-06):
+    - File: ddc.py
+    - Modified K parameter sampling: K values are now divided by G (gene count)
+    - Previous:  world.K = uniform(0.1, 1.0)
+    - Current:   world.K = uniform(0.1, 1.0) / G
+    - Reason:    To address convergence issue. The Hill function half-saturation
+      constant K needs to be scaled relative to network size for proper
+      activation threshold crossing.
+
+v1.1.0 (2026-03-06):
+    - File: ddc_v_1_1_0.py
     - Modified normalize_protein() function: changed protein normalization
       from sum-based to mean-based calculation
     - Previous:  tilde_P = P / (torch.sum(P) + epsilon)
@@ -39,9 +52,6 @@ from typing import Dict, Tuple, List, Any
 G: int = 50
 T: int = 200
 R_TOTAL: float = 1.0
-# ### 0305 方案2：增大R_total，其余不变
-# R_TOTAL: float = 25.0
-# ### 经测试，无效果
 EPSILON: float = 1e-8
 K_POP: float = 1.0
 DTYPE: torch.dtype = torch.float64
@@ -88,6 +98,7 @@ for macro, micro_dict in GENE_CATEGORIES.items():
         for g in gene_list:
             GENE_TO_MACRO[g] = macro
             GENE_TO_MICRO[g] = micro
+
 ### 0304 ADD END
 
 def stable_sigmoid(x: Tensor) -> Tensor:
@@ -205,10 +216,11 @@ def sample_world(seed: int) -> World:
 
     world.alpha = torch.empty(G, dtype=DTYPE).normal_(0, 1, generator=rng)
     world.rho = torch.empty(G, dtype=DTYPE).uniform_(0.5, 2.0, generator=rng)
-    world.K = torch.empty(G, dtype=DTYPE).uniform_(0.1, 1.0, generator=rng)
+    # world.K = torch.empty(G, dtype=DTYPE).uniform_(0.1, 1.0, generator=rng)
     # ### 0305 adjust K to prevent X, P from decreasing too fast 
     # world.K = torch.empty(G, dtype=DTYPE).uniform_(0.01, 0.1, generator=rng)
     # ###
+    world.K = torch.empty(G, dtype=DTYPE).uniform_(0.1, 1.0, generator=rng) / G
     world.n = torch.full((G,), 2.0, dtype=DTYPE)
     world.delta_x = torch.empty(G, dtype=DTYPE).uniform_(0.1, 0.5, generator=rng)
     world.delta_p = torch.empty(G, dtype=DTYPE).uniform_(0.05, 0.3, generator=rng)
@@ -434,7 +446,6 @@ def run_smoke_test(seed: int, T: int = 10) -> Dict[str, Tensor]:
     print("Smoke test passed!")
     
     return traj
-
 
 def run_sanity_tests(seed: int) -> None:
     """
