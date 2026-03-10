@@ -98,7 +98,6 @@ for macro, micro_dict in GENE_CATEGORIES.items():
         for g in gene_list:
             GENE_TO_MACRO[g] = macro
             GENE_TO_MICRO[g] = micro
-
 ### 0304 ADD END
 
 def stable_sigmoid(x: Tensor) -> Tensor:
@@ -217,10 +216,12 @@ def sample_world(seed: int) -> World:
     world.alpha = torch.empty(G, dtype=DTYPE).normal_(0, 1, generator=rng)
     world.rho = torch.empty(G, dtype=DTYPE).uniform_(0.5, 2.0, generator=rng)
     # world.K = torch.empty(G, dtype=DTYPE).uniform_(0.1, 1.0, generator=rng)
-    # ### 0305 adjust K to prevent X, P from decreasing too fast 
+    # ### 0306 把K缩小一个数量级
     # world.K = torch.empty(G, dtype=DTYPE).uniform_(0.01, 0.1, generator=rng)
     # ###
+    ### 0306 K = U(0.1, 1.0) / G
     world.K = torch.empty(G, dtype=DTYPE).uniform_(0.1, 1.0, generator=rng) / G
+    ###
     world.n = torch.full((G,), 2.0, dtype=DTYPE)
     world.delta_x = torch.empty(G, dtype=DTYPE).uniform_(0.1, 0.5, generator=rng)
     world.delta_p = torch.empty(G, dtype=DTYPE).uniform_(0.05, 0.3, generator=rng)
@@ -255,11 +256,11 @@ def sample_world(seed: int) -> World:
 # Module Interface Contracts
 # ==========================================
 def normalize_protein(P: Tensor, world: World) -> Tensor:
-    # return P / (torch.sum(P) + world.epsilon)
-    ### 0305 方案3：思路与方案1相同，但改为在生成tilde_P就乘G
-    ### 以便update_chromatin时避免尺度失衡
-    return P / (torch.mean(P) + world.epsilon)
-    ### 采用此方案
+    return P / (torch.sum(P) + world.epsilon)
+    # ## 0305 方案3：思路与方案1相同，但改为在生成tilde_P就乘G
+    # ## 以便update_chromatin时避免尺度失衡
+    # return P / (torch.mean(P) + world.epsilon)
+    # ## 采用此方案
 
 def compute_TFinput(tilde_P: Tensor, world: World) -> Tensor:
     TFinput: Tensor = torch.zeros(G, dtype=DTYPE)
@@ -267,10 +268,6 @@ def compute_TFinput(tilde_P: Tensor, world: World) -> Tensor:
         d_i = len(world.P_graph[i])
         prod = 1.0
         for j in world.P_graph[i]:
-            # ### 0305 方案1：乘以 G，将均值拉回 1.0 附近，抵消网络规模带来的稀释，其余不变
-            # scaled_P = tilde_P[j] * G
-            # prod *= (scaled_P ** world.a_ij[i][j])
-            # ### 这样会使下游的Z计算受影响，导致Z几乎不变，故弃用
             prod *= (tilde_P[j] ** world.a_ij[i][j])
         TFinput[i] = prod ** (1.0 / d_i)
     return TFinput
@@ -287,7 +284,7 @@ def update_mRNA(X: Tensor, Z: Tensor, TFinput: Tensor, world: World) -> Tensor:
     X_next = (1.0 - world.delta_x) * X + Z * world.rho * hill_term
 
     ### 0305 ADD
-    print(f'Hill term avg: {hill_term.mean().item()}')
+    # print(f'Hill term avg: {hill_term.mean().item()}')
     ###
     return X_next
 
@@ -446,6 +443,7 @@ def run_smoke_test(seed: int, T: int = 10) -> Dict[str, Tensor]:
     print("Smoke test passed!")
     
     return traj
+
 
 def run_sanity_tests(seed: int) -> None:
     """
