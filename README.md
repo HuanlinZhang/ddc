@@ -68,6 +68,7 @@ update_fate: N' = N + r·N·(1-N/K_pop)
 X(t+1), P(t+1), Z(t+1), N(t+1)
 ```
 
+<<<<<<< Updated upstream
 ## Model Parameters
 
 ### Gene-level Parameters
@@ -103,6 +104,27 @@ X(t+1), P(t+1), Z(t+1), N(t+1)
 |-------|--------|--------|--------|
 | **P_graph** | TF (0-5) | All genes (≠ itself) | 1-3 per gene |
 | **E_graph** | EPI (17-19) | All genes | 2 per gene |
+=======
+## Environment Requirements
+
+- **Python**: 3.8+
+- **PyTorch**: 1.9.0+ (tested with 2.10.0)
+- **NumPy**: 1.20.0+ (tested with 1.23.5)
+
+## Installation
+
+```bash
+pip install torch numpy
+```
+
+Or clone and install in development mode:
+
+```bash
+git clone https://github.com/HuanlinZhang/ddc.git
+cd ddc
+pip install -e .
+```
+>>>>>>> Stashed changes
 
 ## Core Functions
 
@@ -112,6 +134,7 @@ X(t+1), P(t+1), Z(t+1), N(t+1)
 def sample_world(seed: int) -> World
 ```
 
+<<<<<<< Updated upstream
 Generate a random gene network world with all parameters sampled from the distributions defined above. The world contains:
 - Gene-level parameters (alpha, rho, K, n, delta_x, delta_p, gamma)
 - Edge-level parameters (a_ij, beta_ij)
@@ -125,6 +148,9 @@ def from_dict(self, data: Dict[str, Any]) -> None
 ```
 
 Serialize/deserialize World object for reproducibility. Includes all graph adjacency lists, parameter arrays, and random seed.
+=======
+Generate a random gene network world.
+>>>>>>> Stashed changes
 
 ### simulate_single_cell
 
@@ -139,6 +165,7 @@ def simulate_single_cell(
 ) -> Dict[str, Tensor]
 ```
 
+<<<<<<< Updated upstream
 Simulate single cell time evolution from initial state to t_steps. Returns:
 - `X_traj`: Tensor of shape (t_steps+1, G) - mRNA trajectories
 - `P_traj`: Tensor of shape (t_steps+1, G) - protein trajectories
@@ -158,6 +185,13 @@ Sample initial state for a single cell:
 - P0 = gamma * X0 with resource projection
 - Z0 = sigmoid(alpha) - chromatin initial state
 - N0 = 1.0 - initial cell count
+=======
+Simulate single cell time evolution. Returns:
+- `X_traj`: (t_steps+1, G)
+- `P_traj`: (t_steps+1, G)
+- `Z_traj`: (t_steps+1, G)
+- `N_traj`: (t_steps+1,)
+>>>>>>> Stashed changes
 
 ### generate_dataset
 
@@ -213,6 +247,7 @@ Apply gene perturbation. Config options:
 - `override_alpha`: Dict {gene: value}
 - `R_total`: float
 
+<<<<<<< Updated upstream
 ### run_smoke_test
 
 ```python
@@ -233,6 +268,8 @@ Comprehensive sanity tests:
 3. Resource bound: sum(P) <= R_total
 4. Stability: all values finite for T=200
 
+=======
+>>>>>>> Stashed changes
 ## Quick Start
 
 ```python
