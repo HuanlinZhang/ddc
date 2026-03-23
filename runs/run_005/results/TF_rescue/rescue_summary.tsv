@@ -1,0 +1,113 @@
+seed	world_type	support_type	support_target	support_strength	original_regime	rescued_regime
+546	collapse	overexpression	X of TF	2	collapse	collapse
+546	collapse	overexpression	X of TF	3	collapse	collapse
+546	collapse	overexpression	X of TF	4	collapse	collapse
+546	collapse	overexpression	X of TF	5	collapse	collapse
+546	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+546	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+546	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+546	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+6798	collapse	overexpression	X of TF	2	collapse	collapse
+6798	collapse	overexpression	X of TF	3	collapse	collapse
+6798	collapse	overexpression	X of TF	4	collapse	collapse
+6798	collapse	overexpression	X of TF	5	collapse	collapse
+6798	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+6798	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+6798	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+6798	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+546	collapse	overexpression	X of TF	2	collapse	collapse
+546	collapse	overexpression	X of TF	3	collapse	collapse
+546	collapse	overexpression	X of TF	4	collapse	collapse
+546	collapse	overexpression	X of TF	5	collapse	collapse
+546	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+546	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+546	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+546	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+4578	collapse	overexpression	X of TF	2	collapse	collapse
+4578	collapse	overexpression	X of TF	3	collapse	collapse
+4578	collapse	overexpression	X of TF	4	collapse	collapse
+4578	collapse	overexpression	X of TF	5	collapse	collapse
+4578	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+4578	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+4578	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+4578	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+6798	collapse	overexpression	X of TF	2	collapse	collapse
+6798	collapse	overexpression	X of TF	3	collapse	collapse
+6798	collapse	overexpression	X of TF	4	collapse	collapse
+6798	collapse	overexpression	X of TF	5	collapse	collapse
+6798	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+6798	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+6798	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+6798	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+2177	collapse	overexpression	X of TF	2	collapse	collapse
+2177	collapse	overexpression	X of TF	3	collapse	collapse
+2177	collapse	overexpression	X of TF	4	collapse	collapse
+2177	collapse	overexpression	X of TF	5	collapse	collapse
+2177	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+2177	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+2177	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+2177	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+3492	collapse	overexpression	X of TF	2	collapse	collapse
+3492	collapse	overexpression	X of TF	3	collapse	collapse
+3492	collapse	overexpression	X of TF	4	collapse	collapse
+3492	collapse	overexpression	X of TF	5	collapse	collapse
+3492	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+3492	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+3492	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+3492	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+2177	collapse	overexpression	X of TF	2	collapse	collapse
+2177	collapse	overexpression	X of TF	3	collapse	collapse
+2177	collapse	overexpression	X of TF	4	collapse	collapse
+2177	collapse	overexpression	X of TF	5	collapse	collapse
+2177	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+2177	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+2177	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+2177	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+3492	collapse	overexpression	X of TF	2	collapse	collapse
+3492	collapse	overexpression	X of TF	3	collapse	collapse
+3492	collapse	overexpression	X of TF	4	collapse	collapse
+3492	collapse	overexpression	X of TF	5	collapse	collapse
+3492	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+3492	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+3492	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+3492	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+7483	collapse	overexpression	X of TF	2	collapse	collapse
+7483	collapse	overexpression	X of TF	3	collapse	collapse
+7483	collapse	overexpression	X of TF	4	collapse	collapse
+7483	collapse	overexpression	X of TF	5	collapse	collapse
+7483	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+7483	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+7483	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+7483	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+4578	collapse	overexpression	X of TF	2	collapse	collapse
+4578	collapse	overexpression	X of TF	3	collapse	collapse
+4578	collapse	overexpression	X of TF	4	collapse	collapse
+4578	collapse	overexpression	X of TF	5	collapse	collapse
+4578	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+4578	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+4578	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+4578	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+3441	collapse	overexpression	X of TF	2	collapse	collapse
+3441	collapse	overexpression	X of TF	3	collapse	collapse
+3441	collapse	overexpression	X of TF	4	collapse	collapse
+3441	collapse	overexpression	X of TF	5	collapse	collapse
+3441	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+3441	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+3441	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+3441	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+3441	collapse	overexpression	X of TF	2	collapse	collapse
+3441	collapse	overexpression	X of TF	3	collapse	collapse
+3441	collapse	overexpression	X of TF	4	collapse	collapse
+3441	collapse	overexpression	X of TF	5	collapse	collapse
+3441	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+3441	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+3441	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+3441	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
+7483	collapse	overexpression	X of TF	2	collapse	collapse
+7483	collapse	overexpression	X of TF	3	collapse	collapse
+7483	collapse	overexpression	X of TF	4	collapse	collapse
+7483	collapse	overexpression	X of TF	5	collapse	collapse
+7483	collapse	clamp	P_next of TF	window:50, threshold:0.02	collapse	collapse
+7483	collapse	clamp	P_next of TF	window:50, threshold:0.04	collapse	collapse
+7483	collapse	clamp	P_next of TF	window:50, threshold:0.06	collapse	collapse
+7483	collapse	clamp	P_next of TF	window:50, threshold:0.08	collapse	collapse
