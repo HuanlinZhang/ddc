@@ -12,6 +12,12 @@ Status: Active
 ================================================================================
 Version History & Update Notes
 ================================================================================
+2026-04-02:
+    - File: ddc.py
+    - Fixed: After applying intervention, the updated state is now recorded in trajectory at time t
+    - This ensures traj[intervention_time] contains the post-intervention state,
+      not the pre-intervention state that was overwritten by the previous dynamics step
+    - Per spec: "After applying intervention, the updated state MUST be recorded in trajectory at time t."
 
 v1.1 (2026-03-23):
     - File: ddc.py
@@ -60,6 +66,10 @@ EPSILON: float = 1e-8
 K_POP: float = 1.0
 DTYPE: torch.dtype = torch.float64
 ENABLE_RESOURCE_PROJECTION: bool = True
+
+# 0323: a_ij sampling range: (min, max)
+# Options: (0.3, 1.2), (0.5, 2.0), etc.
+A_IJ_RANGE: Tuple[float, float] = (0.5, 2.0)
 
 Tensor = torch.Tensor
 State = Dict[str, Any]
@@ -243,11 +253,7 @@ def sample_world(seed: int) -> World:
 
         world.a_ij[i] = {}
         for j in p_nodes:
-            ### 0317 恢复到原始范围
-            world.a_ij[i][j] = torch.empty(1, dtype=DTYPE).uniform_(0.5, 2.0, generator=rng).item()
-            ### 0312 v1.1.2: Reduced a_ij range from [0.5, 2.0] to [0.3, 1.2]
-            # world.a_ij[i][j] = torch.empty(1, dtype=DTYPE).uniform_(0.3, 1.2, generator=rng).item()
-            # world.a_ij[i][j] = torch.empty(1, dtype=DTYPE).uniform_(0.5, 1.2, generator=rng).item()
+            world.a_ij[i][j] = torch.empty(1, dtype=DTYPE).uniform_(A_IJ_RANGE[0], A_IJ_RANGE[1], generator=rng).item()
 
         # Chromatin Graph E(i)
         epi_pool: Tensor = torch.tensor(EPI_GENES, dtype=torch.int64)
@@ -344,6 +350,9 @@ def simulate_single_cell(world: World, X0: Tensor, P0: Tensor, Z0: Tensor, N0: f
     for t in range(t_steps):
         if intervention_time is not None and t == intervention_time:
             X, P, Z, N = apply_intervention(state=(X, P, Z, N), config=intervention_config)
+            # 🔥 Record post-intervention state in trajectory at time t
+            # Per spec: "After applying intervention, the updated state MUST be recorded in trajectory at time t."
+            X_traj[t], P_traj[t], Z_traj[t], N_traj[t] = X, P, Z, N
 
         tilde_P: Tensor = normalize_protein(P, world)
         TFinput: Tensor = compute_TFinput(tilde_P, world)
