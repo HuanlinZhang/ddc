@@ -6,12 +6,18 @@ A computational simulation framework for gene regulatory network dynamics.
 Based on the Phase 0 specification documents.
 
 Author: zhanghl
-Version: v1.1 (Intervention-enabled)
-Status: Active
+Version: v1.2 (Perturbation + Intervention unified)
 
 ================================================================================
 Version History & Update Notes
 ================================================================================
+v1.2 (2026-04-08):
+    - File: ddc.py
+    - KRITICAL FIX: Perturbation vs Intervention semantics corrected per spec v1.2
+    - KO (knockout) is now parameter-level: rho_i = 0 (via apply_perturbation)
+    - knockdown is now state-level: X_i = 0 or P_i = 0 (via apply_intervention)
+    - Renamed knockout_X -> knockdown_X, knockout_P -> knockdown_P in apply_intervention
+
 2026-04-02:
     - File: ddc.py
     - Fixed: After applying intervention, the updated state is now recorded in trajectory at time t
@@ -272,10 +278,6 @@ def sample_world(seed: int) -> World:
 # ==========================================
 def normalize_protein(P: Tensor, world: World) -> Tensor:
     return P / (torch.sum(P) + world.epsilon)
-    # ## 0305 方案3：思路与方案1相同，但改为在生成tilde_P就乘G
-    # ## 以便update_chromatin时避免尺度失衡
-    # return P / (torch.mean(P) + world.epsilon)
-    # ## 采用此方案
 
 def compute_TFinput(tilde_P: Tensor, world: World) -> Tensor:
     TFinput: Tensor = torch.zeros(G, dtype=DTYPE)
@@ -350,7 +352,7 @@ def simulate_single_cell(world: World, X0: Tensor, P0: Tensor, Z0: Tensor, N0: f
     for t in range(t_steps):
         if intervention_time is not None and t == intervention_time:
             X, P, Z, N = apply_intervention(state=(X, P, Z, N), config=intervention_config)
-            # 🔥 Record post-intervention state in trajectory at time t
+            # Record post-intervention state in trajectory at time t
             # Per spec: "After applying intervention, the updated state MUST be recorded in trajectory at time t."
             X_traj[t], P_traj[t], Z_traj[t], N_traj[t] = X, P, Z, N
 
@@ -428,15 +430,40 @@ def generate_dataset(world_seed: int, M: int, save_path: str = None) -> Tuple[Te
     return C, world
 
 # ==========================================
-# Perturbation Interface
+# Perturbation Interface (v1.2)
 # ==========================================
 def apply_perturbation(world: World, state: State, config: Dict[str, Any]) -> Tuple[World, State]:
+    """
+    Apply parameter-level perturbation to World.
+
+    This MODIFIES the World parameters (persistent, changes dynamics).
+
+    Allowed operations:
+        - knockout: Set rho_i = 0 (gene knockout at transcription level)
+        - override_rho: Override rho_i with specific value
+        - override_a_ij: Modify regulatory interaction strength
+        - override_alpha: Modify basal transcription rate
+        - R_total: Modify total resource capacity
+
+    Critical rules:
+        - Must copy World (immutable design)
+        - Original world must NOT be modified
+        - Changes are persistent (affect all subsequent dynamics)
+
+    Args:
+        world: World object
+        state: Tuple of (X, P, Z, N)
+        config: Dict specifying perturbation operations
+
+    Returns:
+        Tuple of (world_perturbed, state_unchanged)
+    """
     world_perturbed: World = copy.deepcopy(world)
     state_perturbed: State = copy.deepcopy(state)
 
     if 'knockout' in config:
         for i in config['knockout']:
-            state_perturbed['X'][i] = 0.0
+            world_perturbed.rho[i] = 0.0
     
     if 'override_rho' in config:
         for i, val in config['override_rho'].items():
@@ -458,7 +485,7 @@ def apply_perturbation(world: World, state: State, config: Dict[str, Any]) -> Tu
 
 
 # ==========================================
-# Intervention Interface (v1.1)
+# Intervention Interface (v1.2)
 # ==========================================
 def apply_intervention(state: Tuple[Tensor, Tensor, Tensor, float],
                       config: Dict[str, Any]) -> Tuple[Tensor, Tensor, Tensor, float]:
@@ -468,9 +495,10 @@ def apply_intervention(state: Tuple[Tensor, Tensor, Tensor, float],
     This is NOT part of system dynamics - it is an external do-operator.
 
     Allowed operations:
-        - Modify P (protein)
-        - Modify X (mRNA)
-        - Modify single or multiple genes
+        - knockdown_X: Set X_i = 0 (state-level, NOT KO)
+        - knockdown_P: Set P_i = 0 (state-level, NOT KO)
+        - scale_P: Multiply P_i by scale factor
+        - set_X / set_P: Override state values
 
     Critical rules:
         - Intervention ONLY executes at specified time point
@@ -478,6 +506,8 @@ def apply_intervention(state: Tuple[Tensor, Tensor, Tensor, float],
         - Intervention step does NOT execute resource projection
         - Intervention must NOT modify World
         - Intervention must NOT change update order
+
+    KO (knockout) semantics: Use apply_perturbation with knockout
 
     Args:
         state: Tuple of (X, P, Z, N)
@@ -504,12 +534,12 @@ def apply_intervention(state: Tuple[Tensor, Tensor, Tensor, float],
         for gene_idx, value in config['set_P']:
             P[gene_idx] = float(value)
 
-    if 'knockout_X' in config:
-        for gene_idx in config['knockout_X']:
+    if 'knockdown_X' in config:
+        for gene_idx in config['knockdown_X']:
             X[gene_idx] = 0.0
 
-    if 'knockout_P' in config:
-        for gene_idx in config['knockout_P']:
+    if 'knockdown_P' in config:
+        for gene_idx in config['knockdown_P']:
             P[gene_idx] = 0.0
 
     return X, P, Z, N
