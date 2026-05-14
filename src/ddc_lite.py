@@ -124,15 +124,29 @@ def sample_initial_state(cell_seed: int, world: World) -> Tuple[Tensor, Tensor]:
 
 
 def compute_regulatory_response(P: Tensor, world: World) -> Tensor:
-    raise NotImplementedError
+    R: Tensor = torch.zeros(G, dtype=DTYPE)
+    for i in range(G):
+        j: int = world.P_graph[i][0]
+        s: int = world.edge_signs[i][j]
+        pj_n: Tensor = P[j] ** world.n[i]
+        Ki_n: Tensor = world.K[i] ** world.n[i]
+        denom: Tensor = Ki_n + pj_n
+        if s == ACTIVATION:
+            R[i] = pj_n / denom
+        else:
+            R[i] = Ki_n / denom
+    return R
 
 
 def update_mRNA(X: Tensor, P: Tensor, world: World) -> Tensor:
-    raise NotImplementedError
+    R: Tensor = compute_regulatory_response(P, world)
+    X_next: Tensor = (1.0 - world.delta_x) * X + world.rho * R
+    return X_next
 
 
 def update_protein(P: Tensor, X: Tensor, world: World) -> Tensor:
-    raise NotImplementedError
+    P_next: Tensor = (1.0 - world.delta_p) * P + world.gamma * X
+    return P_next
 
 
 def simulate_single_cell(
