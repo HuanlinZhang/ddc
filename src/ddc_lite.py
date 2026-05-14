@@ -120,7 +120,13 @@ def sample_world(seed: int) -> World:
 
 
 def sample_initial_state(cell_seed: int, world: World) -> Tuple[Tensor, Tensor]:
-    raise NotImplementedError
+    rng: torch.Generator = torch.Generator()
+    rng.manual_seed(cell_seed)
+
+    X0: Tensor = torch.empty(G, dtype=DTYPE).uniform_(0, 1, generator=rng)
+    P0: Tensor = world.gamma * X0
+
+    return X0, P0
 
 
 def compute_regulatory_response(P: Tensor, world: World) -> Tensor:
@@ -156,8 +162,31 @@ def simulate_single_cell(
     t_steps: int = T,
     intervention_time: int = None,
     intervention_config: Dict = None,
-) -> Dict[str, Tensor]:
-    raise NotImplementedError
+) -> Dict[str, Any]:
+    X, P = X0, P0
+
+    X_traj: Tensor = torch.zeros((t_steps + 1, G), dtype=DTYPE)
+    P_traj: Tensor = torch.zeros((t_steps + 1, G), dtype=DTYPE)
+
+    X_traj[0], P_traj[0] = X, P
+
+    for t in range(t_steps):
+        if intervention_time is not None and t == intervention_time:
+            X, P = apply_intervention(state=(X, P), config=intervention_config)
+            X_traj[t], P_traj[t] = X, P
+
+        X_next: Tensor = update_mRNA(X, P, world)
+        P_next: Tensor = update_protein(P, X, world)
+
+        X, P = X_next, P_next
+        X_traj[t + 1], P_traj[t + 1] = X, P
+
+    return {
+        'X_traj': X_traj,
+        'P_traj': P_traj,
+        'world_seed': world.seed,
+        'world': world.to_dict(),
+    }
 
 
 def run_simulation(
@@ -166,7 +195,30 @@ def run_simulation(
     intervention_time: int = None,
     intervention_config: Dict = None,
 ) -> Dict[str, Any]:
-    raise NotImplementedError
+    world_seed: int = seed
+    cell_seed: int = seed + 1
+
+    world: World = sample_world(world_seed)
+    X0, P0 = sample_initial_state(cell_seed, world)
+
+    traj: Dict[str, Any] = simulate_single_cell(
+        world, X0, P0, T,
+        intervention_time=intervention_time,
+        intervention_config=intervention_config,
+    )
+
+    traj['cell_seed'] = cell_seed
+
+    if save_path is not None:
+        torch.save({
+            'X_traj': traj['X_traj'],
+            'P_traj': traj['P_traj'],
+            'world_seed': traj['world_seed'],
+            'cell_seed': traj['cell_seed'],
+            'world': traj['world'],
+        }, save_path)
+
+    return traj
 
 
 def generate_dataset(
@@ -174,7 +226,26 @@ def generate_dataset(
     M: int,
     save_path: str = None,
 ) -> Tuple[Tensor, World, List[int]]:
-    raise NotImplementedError
+    world: World = sample_world(world_seed)
+    C: Tensor = torch.zeros((M, G), dtype=DTYPE)
+    cell_seeds: List[int] = []
+
+    for c in range(M):
+        cell_seed_c: int = world_seed + 1 + c
+        cell_seeds.append(cell_seed_c)
+        X0, P0 = sample_initial_state(cell_seed_c, world)
+        traj: Dict[str, Any] = simulate_single_cell(world, X0, P0, T)
+        C[c, :] = traj['X_traj'][T, :]
+
+    if save_path is not None:
+        torch.save({
+            'expression': C,
+            'world_seed': world_seed,
+            'cell_seeds': cell_seeds,
+            'world': world.to_dict(),
+        }, save_path)
+
+    return C, world, cell_seeds
 
 
 def apply_perturbation(
@@ -182,11 +253,59 @@ def apply_perturbation(
     state: State,
     config: Dict[str, Any],
 ) -> Tuple[World, State]:
-    raise NotImplementedError
+    world_perturbed: World = copy.deepcopy(world)
+    state_copy: State = copy.deepcopy(state)
+
+    if 'knockout' in config:
+        for i in config['knockout']:
+            world_perturbed.rho[i] = 0.0
+
+    if 'override_rho' in config:
+        for i, val in config['override_rho'].items():
+            world_perturbed.rho[i] = float(val)
+
+    if 'override_K' in config:
+        for i, val in config['override_K'].items():
+            world_perturbed.K[i] = float(val)
+
+    if 'override_edge_sign' in config:
+        for i, j, val in config['override_edge_sign']:
+            if j in world_perturbed.edge_signs.get(i, {}):
+                world_perturbed.edge_signs[i][j] = int(val)
+
+    return world_perturbed, state_copy
 
 
 def apply_intervention(
     state: Tuple[Tensor, Tensor],
     config: Dict[str, Any],
 ) -> Tuple[Tensor, Tensor]:
-    raise NotImplementedError
+    X, P = state
+    X = X.clone()
+    P = P.clone()
+
+    if 'knockdown_X' in config:
+        for gene_idx in config['knockdown_X']:
+            X[gene_idx] = 0.0
+
+    if 'knockdown_P' in config:
+        for gene_idx in config['knockdown_P']:
+            P[gene_idx] = 0.0
+
+    if 'set_X' in config:
+        for gene_idx, value in config['set_X']:
+            X[gene_idx] = float(value)
+
+    if 'set_P' in config:
+        for gene_idx, value in config['set_P']:
+            P[gene_idx] = float(value)
+
+    if 'scale_X' in config:
+        for gene_idx, scale in config['scale_X']:
+            X[gene_idx] *= scale
+
+    if 'scale_P' in config:
+        for gene_idx, scale in config['scale_P']:
+            P[gene_idx] *= scale
+
+    return X, P
