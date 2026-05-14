@@ -1312,6 +1312,222 @@ def generate_task4_visualizations(collapse_seeds: list, gamma_values: list):
     
     print("\nTask 4 visualizations complete!")
 
+def task4_10_steps_visualize():
+    """
+    Visualize first 10 steps of P_traj for each seed under different gamma values.
+    Uses the same plot style as initial_condition_scaling visualizations.
+    """
+    print("=" * 60)
+    print("Task 4: First 10 Steps Visualization")
+    print("=" * 60)
+    
+    # Load scaling summary to get seeds and gamma values
+    summary_path = os.path.join(RESULTS_DIR, 'initial_condition_scaling', 'scaling_summary.tsv')
+    df_summary = pd.read_csv(summary_path, sep='\t')
+    collapse_seeds = df_summary['seed'].unique().tolist()
+    gamma_values = df_summary['gamma'].unique().tolist()
+    gamma_values = sorted(gamma_values)
+    
+    SCALING_DIR = os.path.join(RESULTS_DIR, 'initial_condition_scaling')
+    PLOT_SUBDIR = os.path.join(PLOTS_DIR, 'initial_condition_scaling')
+    os.makedirs(PLOT_SUBDIR, exist_ok=True)
+    
+    TF_COLOR = plt.cm.Set1(0)
+    EPI_COLOR = plt.cm.Set1(3)
+    OTHER_COLOR = 'gray'
+    
+    def plot_single_panel(ax, P_traj, title=None, max_steps=10):
+        """Plot P_traj on a single axis with gene categories (first max_steps only)."""
+        T_steps = min(P_traj.shape[0], max_steps)
+        t = np.arange(T_steps)
+        P_traj_plot = P_traj[:T_steps]
+        
+        added_labels = set()
+        for gene in range(P_traj_plot.shape[1]):
+            if gene in ddc.TF_GENES:
+                color = TF_COLOR
+                label = "TF" if "TF" not in added_labels else None
+                added_labels.add("TF")
+                alpha, lw, zorder = 0.85, 1.8, 2
+            elif gene in range(17, 20):
+                color = EPI_COLOR
+                label = "Epigenetics" if "Epigenetics" not in added_labels else None
+                added_labels.add("Epigenetics")
+                alpha, lw, zorder = 0.85, 1.8, 2
+            else:
+                color = OTHER_COLOR
+                label = "Others" if "Others" not in added_labels else None
+                added_labels.add("Others")
+                alpha, lw, zorder = 0.5, 0.8, 1
+            
+            ax.plot(t, P_traj_plot[:, gene], color=color, alpha=alpha, lw=lw, zorder=zorder, label=label)
+        
+        ax.grid(True, alpha=0.3)
+        ax.set_ylim(bottom=0)
+        ax.set_xlim(-0.5, T_steps - 0.5)
+        ax.set_xticks(range(T_steps))
+        
+        if title:
+            ax.set_title(title, fontsize=14, fontweight='bold')
+        
+        handles, labels = ax.get_legend_handles_labels()
+        order_map = {"TF": 0, "Epigenetics": 1, "Others": 2}
+        pairs = sorted(zip(handles, labels), key=lambda x: order_map.get(x[1], 99))
+        if pairs:
+            h_sorted, l_sorted = zip(*pairs)
+            ax.legend(h_sorted, l_sorted, fontsize=14, loc='upper right', frameon=True)
+    
+    print("\n--- Generating first 10 steps visualizations ---")
+    
+    for seed in collapse_seeds:
+        fig, axes = plt.subplots(1, 5, figsize=(25, 5))
+        
+        # Load original trajectory
+        traj_path = os.path.join(DIR_ENABLE, f'seed_{seed}_traj.pt')
+        saved_data = torch.load(traj_path)
+        P_traj_original = saved_data['P_traj'].numpy()
+        
+        plot_single_panel(axes[0], P_traj_original, 'Original (first 10 steps)')
+        axes[0].set_ylabel('Protein Expression', fontsize=14)
+        axes[0].set_xlabel('Time step', fontsize=14)
+        
+        for col_idx, gamma in enumerate(gamma_values):
+            path = os.path.join(SCALING_DIR, f'seed{seed}_gamma{gamma}.pt')
+            data = torch.load(path)
+            P_traj = data['P_traj'].numpy()
+            regime = data.get('regime', 'unknown')
+            plot_single_panel(axes[col_idx + 1], P_traj, f'γ={gamma} (first 10 steps)')
+            axes[col_idx + 1].set_xlabel('Time step', fontsize=14)
+        
+        plt.suptitle(f'Task 4: Seed {seed} — First 10 Steps P_traj', fontsize=18, fontweight='bold')
+        plt.tight_layout(rect=[0, 0, 1, 0.98])
+        
+        save_path = os.path.join(PLOT_SUBDIR, f'seed{seed}_first10steps.png')
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+        plt.close(fig)
+        print(f"  Saved: {save_path}")
+    
+    print("\nTask 4 first 10 steps visualization complete!")
+
+
+def task3_10_steps_visualize():
+    """
+    Visualize first 10 steps of P_traj for Task 3 TF Rescue.
+    Uses the same 3x4 grid layout as existing TF_rescue visualizations.
+    """
+    print("=" * 60)
+    print("Task 3: First 10 Steps Visualization")
+    print("=" * 60)
+    
+    rescue_summary_path = os.path.join(RESULTS_DIR, 'TF_rescue', 'rescue_summary.tsv')
+    df_rescue = pd.read_csv(rescue_summary_path, sep='\t')
+    collapse_seeds = df_rescue['seed'].unique().tolist()
+    
+    zeta_values = [2, 3, 4, 5]
+    clamp_window = 50
+    clamp_thresholds = [0.02, 0.04, 0.06, 0.08]
+    
+    TF_RESCUE_DIR = os.path.join(RESULTS_DIR, 'TF_rescue')
+    PLOT_SUBDIR = os.path.join(PLOTS_DIR, 'TF_rescue')
+    os.makedirs(PLOT_SUBDIR, exist_ok=True)
+    
+    TF_COLOR = plt.cm.Set1(0)
+    EPI_COLOR = plt.cm.Set1(3)
+    OTHER_COLOR = 'gray'
+    
+    def plot_single_panel(ax, P_traj, max_steps=10):
+        """Plot P_traj on a single axis with gene categories (first max_steps only)."""
+        T_steps = min(P_traj.shape[0], max_steps)
+        t = np.arange(T_steps)
+        P_traj_plot = P_traj[:T_steps]
+        
+        added_labels = set()
+        for gene in range(P_traj_plot.shape[1]):
+            if gene in ddc.TF_GENES:
+                color = TF_COLOR
+                label = "TF" if "TF" not in added_labels else None
+                added_labels.add("TF")
+                alpha, lw, zorder = 0.85, 1.8, 2
+            elif gene in range(17, 20):
+                color = EPI_COLOR
+                label = "Epigenetics" if "Epigenetics" not in added_labels else None
+                added_labels.add("Epigenetics")
+                alpha, lw, zorder = 0.85, 1.8, 2
+            else:
+                color = OTHER_COLOR
+                label = "Others" if "Others" not in added_labels else None
+                added_labels.add("Others")
+                alpha, lw, zorder = 0.5, 0.8, 1
+            
+            ax.plot(t, P_traj_plot[:, gene], color=color, alpha=alpha, lw=lw, zorder=zorder, label=label)
+        
+        ax.grid(True, alpha=0.3)
+        ax.set_ylim(bottom=0)
+        ax.set_xlim(-0.5, T_steps - 0.5)
+        ax.set_xticks(range(T_steps))
+        
+        handles, labels = ax.get_legend_handles_labels()
+        order_map = {"TF": 0, "Epigenetics": 1, "Others": 2}
+        pairs = sorted(zip(handles, labels), key=lambda x: order_map.get(x[1], 99))
+        if pairs:
+            h_sorted, l_sorted = zip(*pairs)
+            ax.legend(h_sorted, l_sorted, fontsize=14, loc='upper right', frameon=True)
+    
+    print("\n--- Generating first 10 steps visualizations (3x4 grid) ---")
+    
+    for seed in collapse_seeds:
+        fig, axes = plt.subplots(3, 4, figsize=(24, 16))
+        
+        traj_path = os.path.join(DIR_ENABLE, f'seed_{seed}_traj.pt')
+        saved_data = torch.load(traj_path)
+        P_traj_original = saved_data['P_traj'].numpy()
+        
+        # Row 0: Original (only first column)
+        ax_orig = axes[0, 0]
+        plot_single_panel(ax_orig, P_traj_original)
+        ax_orig.set_title('Original (first 10 steps)', fontsize=14, fontweight='bold')
+        ax_orig.set_ylabel('Protein Expression', fontsize=14)
+        ax_orig.set_xlabel('Time step', fontsize=14)
+        
+        # Hide other columns in row 0
+        axes[0, 1].axis('off')
+        axes[0, 2].axis('off')
+        axes[0, 3].axis('off')
+        
+        # Row 1: Overexpression (ζ=2,3,4,5)
+        for col_idx, zeta in enumerate(zeta_values):
+            ax = axes[1, col_idx]
+            path = os.path.join(TF_RESCUE_DIR, f'seed{seed}_overexp_zeta{zeta}.pt')
+            data = torch.load(path)
+            P_traj = data['P_traj'].numpy()
+            plot_single_panel(ax, P_traj)
+            ax.set_title(f'ζ={zeta} (first 10 steps)', fontsize=14, fontweight='bold')
+            if col_idx == 0:
+                ax.set_ylabel('Protein Expression', fontsize=14)
+            ax.set_xlabel('Time step', fontsize=14)
+        
+        # Row 2: Clamp
+        for col_idx, thresh in enumerate(clamp_thresholds):
+            ax = axes[2, col_idx]
+            path = os.path.join(TF_RESCUE_DIR, f'seed{seed}_clamp_win{clamp_window}_thresh{thresh}.pt')
+            data = torch.load(path)
+            P_traj = data['P_traj'].numpy()
+            plot_single_panel(ax, P_traj)
+            ax.set_title(f'clamp={thresh} (first 10 steps)', fontsize=14, fontweight='bold')
+            if col_idx == 0:
+                ax.set_ylabel('Protein Expression', fontsize=14)
+            ax.set_xlabel('Time step', fontsize=14)
+        
+        plt.suptitle(f'Task 3: Seed {seed} — First 10 Steps P_traj', fontsize=18, fontweight='bold')
+        plt.tight_layout(rect=[0, 0, 1, 0.98])
+        
+        save_path = os.path.join(PLOT_SUBDIR, f'seed{seed}_first10steps.png')
+        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+        plt.close(fig)
+        print(f"  Saved: {save_path}")
+    
+    print("\nTask 3 first 10 steps visualization complete!")
+
 
 def main():
     """Main entry point for run_005 analysis."""
@@ -1321,7 +1537,8 @@ def main():
     task2_effective_gain_proxy()
     task3_tf_rescue()
     task4_initial_condition_scaling()
-    
+    task4_10_steps_visualize()
+    task3_10_steps_visualize()
     print("\n" + "=" * 60)
     print("Run 005 Analysis Complete")
     print("=" * 60)

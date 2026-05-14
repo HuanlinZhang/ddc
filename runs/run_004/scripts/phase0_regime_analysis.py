@@ -29,10 +29,12 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 import networkx as nx
+
+sys.path.insert(0, '/home/zhanghl/projects/ddc_github/src')
 from ddc import TF_GENES
 
-DATA_INPUT_DIR = '/home/zhanghl/projects/ddc_github/test_convergence/v1_1_1'
-OUTPUT_DIR = '/home/zhanghl/projects/ddc_github/runs/run_004'
+DATA_INPUT_DIR = '/home/zhanghl/projects/ddc_github/test_convergence/v1_0_repeat'
+OUTPUT_DIR = '/home/zhanghl/projects/ddc_github/runs/run_004_no_P0_proj'
 RESULTS_DIR = os.path.join(OUTPUT_DIR, 'results')
 PLOTS_DIR = os.path.join(OUTPUT_DIR, 'plots')
 DATA_DIR = os.path.join(OUTPUT_DIR, 'data')
@@ -161,7 +163,7 @@ def task1_parameter_comparison():
     df_summary = pd.DataFrame(results)
     df_summary = df_summary.sort_values('seed').reset_index(drop=True)
     
-    df_regime = df_summary[['seed', 'regime']]
+    df_regime = df_summary[['seed', 'regime', 'N_active', 'N_active_TF', 'mean_X_T']]
     
     regime_file = os.path.join(RESULTS_DIR, 'world_regime_classification.tsv')
     df_regime.to_csv(regime_file, sep='\t', index=False)
@@ -211,54 +213,56 @@ def task1_parameter_comparison():
     print("\nParameter Summary:")
     print(df_param_summary.to_string(index=False))
     
-    fig, axes = plt.subplots(3, 3, figsize=(15, 12))
-    
+    fig, axes = plt.subplots(3, 3, figsize=(18, 15))
+
     for idx, param_name in enumerate(params_to_analyze):
         collapse_vals = []
         steady_vals = []
-        
+
         for seed in seeds_collapse:
             params = load_world_parameters(seed)
             if params and param_name in params:
                 collapse_vals.extend(params[param_name])
-        
+
         for seed in seeds_steady:
             params = load_world_parameters(seed)
             if params and param_name in params:
                 steady_vals.extend(params[param_name])
-        
+
         ax_hist1 = axes[0, idx]
         ax_hist1.hist(collapse_vals, bins=50, label='Collapse', color='#E04532', edgecolor='black')
-        ax_hist1.set_title(f'{param_name} - Collapse')
-        ax_hist1.set_xlabel(param_name)
-        ax_hist1.set_ylabel('Count')
-        ax_hist1.grid(True, alpha=0.3)
-        
+        ax_hist1.set_title(f'{param_name} - Collapse', fontsize=18)
+        ax_hist1.set_xlabel(param_name, fontsize=18)
+        ax_hist1.set_ylabel('Count', fontsize=18)
+        ax_hist1.tick_params(labelsize=12)
+
         ax_hist2 = axes[1, idx]
         ax_hist2.hist(steady_vals, bins=50, label='Steady', color='#4C7CB8', edgecolor='black')
-        ax_hist2.set_title(f'{param_name} - Steady')
-        ax_hist2.set_xlabel(param_name)
-        ax_hist2.set_ylabel('Count')
+        ax_hist2.set_title(f'{param_name} - Steady', fontsize=18)
+        ax_hist2.set_xlabel(param_name, fontsize=18)
+        ax_hist2.set_ylabel('Count', fontsize=18)
+        ax_hist2.tick_params(labelsize=12)
         ax_hist2.grid(True, alpha=0.3)
-        
+
         ax_box = axes[2, idx]
         bp = ax_box.boxplot([collapse_vals, steady_vals], tick_labels=['Collapse', 'Steady'], patch_artist=True)
         bp['boxes'][0].set_facecolor('#E04532')
         bp['boxes'][1].set_facecolor('#4C7CB8')
-        
+
         collapse_mean = np.mean(collapse_vals)
         steady_mean = np.mean(steady_vals)
-        
+
         ax_box.annotate(f'mean:{collapse_mean:.4f}', xy=(1, collapse_mean), xytext=(1.08, collapse_mean),
-                       fontsize=9, va='center')
+                        fontsize=12, va='center')
         ax_box.annotate(f'mean:{steady_mean:.4f}', xy=(2, steady_mean), xytext=(2.08, steady_mean),
-                       fontsize=9, va='center')
-        
-        ax_box.set_title(f'{param_name} Boxplot')
-        ax_box.set_ylabel(param_name)
+                        fontsize=12, va='center')
+
+        ax_box.set_title(f'{param_name} Boxplot', fontsize=18)
+        ax_box.set_ylabel(param_name, fontsize=18)
+        ax_box.tick_params(labelsize=18)
         ax_box.grid(True, alpha=0.3)
-    
-    plt.suptitle('Parameter Distribution: Collapse vs Steady Worlds', fontsize=16)
+
+    plt.suptitle('Parameter Distribution', fontsize=24)
     plt.tight_layout()
     
     plot_file = os.path.join(PLOTS_DIR, 'parameter_distribution.png')
@@ -314,6 +318,11 @@ def task2_step2_extract_tf_network_edges(SEEDS):
     
     # Save to file
     df_edges = pd.DataFrame(all_edges)
+    
+    mean_weights = df_edges.groupby('seed')['weight'].mean().reset_index()
+    mean_weights.columns = ['seed', 'mean_weight']
+    df_edges = df_edges.merge(mean_weights, on='seed')
+    
     tf_edges_file = os.path.join(DATA_DIR, 'TF_network_edges.tsv')
     df_edges.to_csv(tf_edges_file, sep='\t', index=False)
     print(f"  Saved: {tf_edges_file}")
@@ -423,7 +432,7 @@ def task2_step4_visualize_tf_networks(SEEDS):
     n_collapse_rows = (n_collapse + n_cols - 1) // n_cols
     n_rows = n_collapse_rows + 1  # +1 for steady row
     
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(16, 4*n_rows))
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(20, 5*n_rows))
     axes = axes.flatten() if n_rows > 1 else [axes]
     
     # Helper function to plot a single network
@@ -477,9 +486,9 @@ def task2_step4_visualize_tf_networks(SEEDS):
             else:
                 node_colors.append('#CCCCCC')  # Not in SCC - gray
             
-            node_size = 300 + total_degrees.get(node, 0) * 100
+            node_size = 700 + total_degrees.get(node, 0) * 200
             node_sizes.append(node_size)
-        
+
         # Draw edges
         edge_colors = []
         for u, v in G.edges():
@@ -488,21 +497,21 @@ def task2_step4_visualize_tf_networks(SEEDS):
                 edge_colors.append('#E04532')  # Activation - red
             else:
                 edge_colors.append('#4C7CB8')  # Repression - blue
-        
+
         # Draw network
-        nx.draw_networkx_edges(G, pos, ax=ax, edge_color=edge_colors, 
-                              width=1.5, alpha=0.6, arrows=True,
-                              arrowsize=10, connectionstyle="arc3,rad=0.1")
-        
+        nx.draw_networkx_edges(G, pos, ax=ax, edge_color=edge_colors,
+                              width=3.0, alpha=0.7, arrows=True,
+                              arrowsize=25, connectionstyle="arc3,rad=0.1")
+
         nx.draw_networkx_nodes(G, pos, ax=ax, node_color=node_colors,
-                              node_size=node_sizes, alpha=0.8)
-        
-        nx.draw_networkx_labels(G, pos, ax=ax, font_size=10, 
+                              node_size=node_sizes, alpha=0.9)
+
+        nx.draw_networkx_labels(G, pos, ax=ax, font_size=16,
                                font_weight='bold')
-        
+
         # Title
         ax.set_title(f'{regime.upper()} - Seed {seed}\n'
-                    f'SCC: {scc_size} | Cycles: {n_cycles}', fontsize=10)
+                    f'SCC: {scc_size} | Cycles: {n_cycles}', fontsize=18)
         ax.axis('off')
         ax.grid(False)
     
@@ -523,11 +532,11 @@ def task2_step4_visualize_tf_networks(SEEDS):
     for idx in range(steady_start_idx + n_steady, len(axes)):
         axes[idx].axis('off')
     
-    plt.suptitle('TF Regulatory Network Topology\n(Collapse worlds in first rows, Steady worlds in last row)', 
-                fontsize=16, y=1.02)
+    plt.suptitle('TF Regulatory Network Topology',
+                fontsize=24, y=1)
     plt.tight_layout()
     
-    plot_file = os.path.join(PLOTS_DIR, 'TF_network_topology.png')
+    plot_file = os.path.join(PLOTS_DIR, 'TF_network_visualization.png')
     plt.savefig(plot_file, dpi=150, bbox_inches='tight')
     plt.close()
     print(f"  Saved: {plot_file}")
@@ -742,9 +751,9 @@ def main():
     print("Phase 0 Regime Analysis")
     print("=" * 60)
     
-    # df_summary = task1_parameter_comparison()
+    df_summary = task1_parameter_comparison()
     
-    # task2_tf_topology_analysis()
+    task2_tf_topology_analysis()
     
     task3_tf_dynamics_analysis()
     
