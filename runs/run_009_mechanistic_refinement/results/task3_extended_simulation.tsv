@@ -1,0 +1,6 @@
+seed	gene_id	perturbation	source	baseline_regime_T400	T	was_steady_T400	final_regime	n_active_genes	classification
+4094	4	KO	run_007	steady	800	True	collapse-like	0	slow_collapse
+4094	5	KO	run_007	steady	800	True	collapse-like	0	slow_collapse
+20	2	KO	run_007_se	steady	800	True	collapse-like	0	slow_collapse
+20	3	KO	run_007_se	steady	1200	True	collapse-like	0	slow_collapse
+33	3	KO	run_007_se	collapse-like	800	True	collapse-like	0	slow_collapse

@@ -1,0 +1,10 @@
+seed_id	gene_id	gene_type	baseline_regime	ko_regime	transition_type	Δmean_P_terminal	deviation_score
+69	0	TF	steady	steady	steady->steady	2.0816681711721685e-17	1.2561091485582767
+69	1	TF	steady	steady	steady->steady	2.0816681711721685e-17	1.2230570649099732
+69	2	TF	steady	collapse-like	steady->collapse-like	-0.019999999999999164	0.9574676558331165
+69	3	TF	steady	collapse-like	steady->collapse-like	-0.019999999999997933	0.9786452625873607
+69	4	TF	steady	steady	steady->steady	3.469446951953614e-18	0.6847310620196202
+69	5	TF	steady	steady	steady->steady	1.734723475976807e-17	1.268286933951789
+69	17	EPI	steady	steady	steady->steady	0.0	0.0056197741402102
+69	18	EPI	steady	steady	steady->steady	-1.3877787807814457e-17	0.00028777050456737233
+69	19	EPI	steady	steady	steady->steady	0.0	0.0003783569145592325

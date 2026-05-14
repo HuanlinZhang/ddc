@@ -1,0 +1,7 @@
+gene_id	collapse_rate	out_degree	in_degree	SCC_id	group
+0	0.5	2.0	1.8	0	surviving
+1	0.75	1.8	2.2	0	surviving
+2	0.875	2.2	2.5	0	surviving
+3	0.5	2.0	1.2	0	surviving
+4	0.75	2.3	2.3	0	surviving
+5	0.875	2.1	2.4	0	surviving

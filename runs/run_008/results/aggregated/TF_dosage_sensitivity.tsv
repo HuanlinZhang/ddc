@@ -1,0 +1,7 @@
+gene_id	collapse_rate_0.5	collapse_rate_0.1	collapse_rate_KO	classification
+0	0.25	0.75	1.0	haploinsufficient_like
+1	0.5	0.5	1.0	haploinsufficient_like
+2	0.5	0.5	1.0	haploinsufficient_like
+3	0.25	0.75	1.0	haploinsufficient_like
+4	0.25	0.75	0.75	haploinsufficient_like
+5	0.25	0.5	0.75	haploinsufficient_like

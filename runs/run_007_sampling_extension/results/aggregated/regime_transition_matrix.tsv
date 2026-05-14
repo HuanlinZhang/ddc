@@ -1,0 +1,10 @@
+gene_id	collapse-like->collapse-like	collapse-like->steady	steady->collapse-like	steady->steady	total
+0	2	0	4	4	10
+1	2	0	6	2	10
+2	2	0	7	1	10
+3	1	1	4	4	10
+4	2	0	6	2	10
+5	2	0	7	1	10
+17	2	0	0	8	10
+18	1	1	0	8	10
+19	2	0	0	8	10

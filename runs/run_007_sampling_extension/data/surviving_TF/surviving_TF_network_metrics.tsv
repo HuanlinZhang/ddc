@@ -1,0 +1,7 @@
+gene_id	in_degree	out_degree	total_degree	SCC_id	largest_SCC_size
+0	1.8	2.0	3.8	0	6
+1	2.2	1.8	4.0	0	6
+2	2.5	2.2	4.7	0	6
+3	1.2	2.0	3.2	0	6
+4	2.3	2.3	4.6	0	6
+5	2.4	2.1	4.5	0	6
