@@ -60,14 +60,63 @@ class World:
         self.gamma: Tensor = torch.zeros(G, dtype=DTYPE)
 
     def to_dict(self) -> Dict[str, Any]:
-        raise NotImplementedError
+        return {
+            'seed': self.seed,
+            'P_graph': {str(k): v for k, v in self.P_graph.items()},
+            'edge_signs': {
+                str(k): {str(sk): sv for sk, sv in v.items()}
+                for k, v in self.edge_signs.items()
+            },
+            'parameters': {
+                'rho': self.rho.tolist(),
+                'K': self.K.tolist(),
+                'n': self.n.tolist(),
+                'delta_x': self.delta_x.tolist(),
+                'delta_p': self.delta_p.tolist(),
+                'gamma': self.gamma.tolist(),
+            },
+        }
 
     def from_dict(self, data: Dict[str, Any]) -> None:
-        raise NotImplementedError
+        self.seed = data['seed']
+        self.P_graph = {int(k): v for k, v in data['P_graph'].items()}
+        self.edge_signs = {
+            int(k): {int(sk): sv for sk, sv in v.items()}
+            for k, v in data['edge_signs'].items()
+        }
+        params = data['parameters']
+        self.rho = torch.tensor(params['rho'], dtype=DTYPE)
+        self.K = torch.tensor(params['K'], dtype=DTYPE)
+        self.n = torch.tensor(params['n'], dtype=DTYPE)
+        self.delta_x = torch.tensor(params['delta_x'], dtype=DTYPE)
+        self.delta_p = torch.tensor(params['delta_p'], dtype=DTYPE)
+        self.gamma = torch.tensor(params['gamma'], dtype=DTYPE)
 
 
 def sample_world(seed: int) -> World:
-    raise NotImplementedError
+    rng: torch.Generator = torch.Generator()
+    rng.manual_seed(seed)
+
+    world: World = World(seed)
+
+    world.rho = torch.empty(G, dtype=DTYPE).uniform_(0.5, 2.0, generator=rng)
+    world.K = torch.empty(G, dtype=DTYPE).uniform_(1.0, 5.0, generator=rng)
+    world.n = torch.full((G,), 2.0, dtype=DTYPE)
+    world.delta_x = torch.empty(G, dtype=DTYPE).uniform_(0.1, 0.5, generator=rng)
+    world.delta_p = torch.empty(G, dtype=DTYPE).uniform_(0.05, 0.3, generator=rng)
+    world.gamma = torch.full((G,), 1.0, dtype=DTYPE)
+
+    for i in range(G):
+        tf_pool: List[int] = [tf for tf in TF_GENES if tf != i]
+        idx: int = int(torch.randint(0, len(tf_pool), (1,), generator=rng).item())
+        regulator: int = tf_pool[idx]
+        world.P_graph[i] = [regulator]
+
+        world.edge_signs[i] = {}
+        sign: int = ACTIVATION if torch.rand(1, generator=rng).item() < 0.5 else REPRESSION
+        world.edge_signs[i][regulator] = sign
+
+    return world
 
 
 def sample_initial_state(cell_seed: int, world: World) -> Tuple[Tensor, Tensor]:
