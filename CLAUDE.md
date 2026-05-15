@@ -1,94 +1,68 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+DDC (Designed Digital Cell) - Gene regulatory network simulator.
 
-## Project Overview
+## Project Structure
 
-DDC (Designed Digital Cell) is a computational framework for simulating gene regulatory network (GRN) dynamics at the single-cell level. It supports Monte Carlo sampling, multi-cell dataset generation, and gene perturbation experiments.
-
-## Environment Setup
-
-```bash
-pip install torch numpy
-# or
-pip install -e .
+```
+src/ddc/
+├── __init__.py    # Public API: run_simulation, generate_dataset, sample_world, etc.
+├── core.py        # Core simulation logic (World, simulate_single_cell, update functions)
+├── cli.py         # CLI entry point (argparse)
+pyproject.toml
+docs/Phase0/       # Phase 0 specifications
+docs/mics/         # Parameter reference
 ```
 
-Requirements: Python 3.8+, PyTorch 1.9.0+, NumPy 1.20.0+
+## Key Functions
+
+| Function | Location | Purpose |
+|----------|----------|---------|
+| `sample_world(seed)` | core.py | Generate random gene network world |
+| `simulate_single_cell(world, X0, P0, Z0, N0, t_steps)` | core.py | Simulate single cell trajectory |
+| `run_simulation(seed, save_path)` | core.py | Full pipeline, returns trajectory dict |
+| `generate_dataset(world_seed, M, save_path)` | core.py | Multi-cell dataset (M, 50) |
+| `apply_perturbation(world, state, config)` | core.py | Parameter-level perturbation |
+| `apply_intervention(state, config)` | core.py | State-level intervention |
 
 ## Running
 
-**As module:**
-```python
-from ddc import run_simulation
-result = run_simulation(seed=42, save_path='./data/traj.pt')
-```
-
-**Direct execution:**
+**CLI:**
 ```bash
-python src/ddc.py  # runs smoke test with T=10
+ddc run --seed 42 --output ./traj.pt
+ddc dataset --world-seed 0 --M 100 --output dataset.pt
+ddc smoke-test --seed 42
 ```
 
-**Run tests:**
-```bash
-python test_stages.py        # Stage A/B/C tests
-python convergence_test.py   # Convergence testing
-```
-
-## Architecture
-
-### Core State Variables
-- `X` (G,): mRNA expression levels
-- `P` (G,): Protein levels
-- `Z` (G,): Chromatin states (0-1)
-- `N`: Cell count
-
-### Gene Categories (50 genes total)
-| Category | Indices | Count |
-|----------|---------|-------|
-| TF (Transcription Factors) | 0-5 | 6 |
-| RBP | 6-10 | 5 |
-| Kinase | 11-13 | 3 |
-| Phosphatase | 14-16 | 3 |
-| Epigenetic | 17-19 | 3 |
-| Cell Cycle | 20-22 | 3 |
-| Apoptosis | 23-25 | 3 |
-| Background | 26-49 | 24 |
-
-### Key Functions (`src/ddc.py`)
-| Function | Purpose |
-|----------|---------|
-| `sample_world(seed)` | Generate random gene network world |
-| `simulate_single_cell(world, X0, P0, Z0, N0, t_steps)` | Simulate single cell trajectory |
-| `generate_dataset(world_seed, M, save_path)` | Generate multi-cell dataset (M cells) |
-| `run_simulation(seed, save_path)` | Full simulation pipeline |
-| `apply_perturbation(world, state, config)` | Parameter-level perturbation |
-| `apply_intervention(state, config)` | State-level intervention |
-
-### Data Flow (per timestep)
-```
-X(t), P(t), Z(t), N(t)
-    → normalize_protein: P̃ = P / ΣP
-    → compute_TFinput: TF = (∏P̃ᵃʲ)^(1/dᵢ)
-    → update_chromatin: Z = σ(α + ΣβᵢⱼP̃ⱼ)
-    → update_mRNA: X' = (1-δₓ)X + Z·ρ·hill(TF)
-    → update_protein: P_raw = (1-δₚ)P + γX
-    → resource_projection: if ΣP > R_total, scale proportionally
-    → update_fate: N' = N + r·N·(1-N/K_pop)
-    → X(t+1), P(t+1), Z(t+1), N(t+1)
-```
-
-### Global Flags
-`ENABLE_RESOURCE_PROJECTION` (default: True) in `src/ddc.py` - toggle resource constraint
-
-### Output Format
-Saved `.pt` files contain:
+**Python:**
 ```python
-{
-    'X_traj': Tensor,  # (T+1, G)
-    'P_traj': Tensor,  # (T+1, G)
-    'Z_traj': Tensor,  # (T+1, G)
-    'N_traj': Tensor,  # (T+1,)
-    'world': Dict      # Serialized World object
-}
+from ddc import run_simulation, generate_dataset
+traj = run_simulation(seed=42)
+dataset, world = generate_dataset(world_seed=0, M=100)
 ```
+
+**Editable install:**
+```bash
+pip install -e .
+```
+
+## Architecture Notes
+
+- `src/ddc.py` is a backward-compatible shim; all logic is in `src/ddc/core.py`
+- `src/ddc/__init__.py` exposes the public API
+- Simulation uses `torch.float64` throughout
+- `ENABLE_RESOURCE_PROJECTION` global flag in core.py controls resource constraint
+
+## Data Flow
+
+```
+normalize_protein → compute_TFinput → update_chromatin → update_mRNA
+    → update_protein_raw → apply_resource_projection → update_fate
+```
+
+## Perturbation vs Intervention
+
+- **Perturbation** (`apply_perturbation`): modifies World parameters (persistent, changes dynamics)
+  - KO: `rho_i = 0` via `config={'knockout': [i]}`
+- **Intervention** (`apply_intervention`): modifies State (single-step, does not change dynamics)
+  - Knockdown: `config={'knockdown_X': [i]}` sets X_i = 0 at intervention time only
