@@ -15,7 +15,7 @@ pip install -e .
 Or from GitHub:
 
 ```bash
-pip install git+https://github.com/EasyPiPi/ddc.git
+pip install git+https://github.com/HuanlinZhang/ddc.git
 ```
 
 Requires: Python 3.8+, PyTorch 2.0+, NumPy 1.20+
@@ -98,5 +98,24 @@ Saved `.pt` files:
 ## Documentation
 
 - `docs/Phase0/`: Phase 0 specifications (Architecture, Design, System Definition, Spec v1.2)
-- `docs/mics/`: Parameter reference
 - `ENV_SETUP.md`: Environment setup notes (WSL/mamba/pip)
+- `CHANGELOG.md`: Version history
+- `LICENSE`: MIT License
+
+## Testing
+
+```bash
+pytest tests/
+```
+
+## Quick Start
+
+```python
+from ddc import run_simulation, generate_dataset
+
+# Run simulation
+traj = run_simulation(seed=42, save_path='./traj.pt')
+
+# Generate dataset
+dataset, world = generate_dataset(world_seed=0, M=100)
+```
