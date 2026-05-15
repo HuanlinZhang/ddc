@@ -57,6 +57,7 @@ def cmd_dataset(args):
         world_seed=args.world_seed,
         M=args.M,
         save_path=args.output,
+        n_jobs=args.n_jobs,
     )
     print(f"Dataset saved to {args.output}")
     print(f"  Shape: {dataset.shape}")
@@ -142,6 +143,7 @@ def main():
     p_ds.add_argument("--world-seed", type=int, required=True, help="World random seed")
     p_ds.add_argument("--M", type=int, required=True, help="Number of cells")
     p_ds.add_argument("--output", type=str, required=True, help="Output .pt file path")
+    p_ds.add_argument("--n-jobs", type=int, default=1, help="Number of parallel workers (default: 1)")
     p_ds.set_defaults(func=cmd_dataset)
 
     # ddc world

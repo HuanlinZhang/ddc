@@ -449,15 +449,48 @@ def run_simulation(world_seed: int,
 
     return traj
 
-def generate_dataset(world_seed: int, M: int, save_path: str = None) -> Tuple[Tensor, World]:
-    world: World = sample_world(world_seed)
-    C: Tensor = torch.zeros((M, G), dtype=DTYPE)
 
-    for c in range(M):
-        cell_seed_c: int = world_seed + 1 + c
-        X0, P0, Z0, N0 = sample_initial_state(cell_seed_c, world)
-        traj: Dict[str, Tensor] = simulate_single_cell(world, X0, P0, Z0, N0, T)
-        C[c, :] = traj['X_traj'][T, :]
+# ==========================================
+# Dataset Generation (parallel)
+# ==========================================
+def _dataset_cell_worker(args):
+    """Module-level worker for multiprocessing dataset generation."""
+    idx, cell_seed, world_dict = args
+    w = World(0)
+    w.from_dict(world_dict)
+    X0, P0, Z0, N0 = sample_initial_state(cell_seed, w)
+    traj = simulate_single_cell(w, X0, P0, Z0, N0, T)
+    return idx, traj['X_traj'][T, :]
+
+
+def generate_dataset(world_seed: int,
+                    M: int,
+                    save_path: str = None,
+                    n_jobs: int = 1) -> Tuple[Tensor, World]:
+    world: World = sample_world(world_seed)
+
+    if n_jobs == 1:
+        C: Tensor = torch.zeros((M, G), dtype=DTYPE)
+        for c in range(M):
+            cell_seed_c: int = world_seed + 1 + c
+            X0, P0, Z0, N0 = sample_initial_state(cell_seed_c, world)
+            traj: Dict[str, Tensor] = simulate_single_cell(world, X0, P0, Z0, N0, T)
+            C[c, :] = traj['X_traj'][T, :]
+    else:
+        import multiprocessing
+        try:
+            multiprocessing.set_start_method('spawn')
+        except RuntimeError:
+            pass  # already set
+        from multiprocessing import Pool
+        world_dict: Dict[str, Any] = world.to_dict()
+        cell_seeds = [world_seed + 1 + c for c in range(M)]
+
+        with Pool(n_jobs) as pool:
+            results = pool.map(_dataset_cell_worker,
+                               [(i, cs, world_dict) for i, cs in enumerate(cell_seeds)])
+        results.sort(key=lambda x: x[0])
+        C = torch.stack([r[1] for r in results])
 
     if save_path is not None:
         torch.save({
