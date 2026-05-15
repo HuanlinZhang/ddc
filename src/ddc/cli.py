@@ -26,10 +26,15 @@ from ddc.core import (
 
 def cmd_run(args):
     """Run single-cell simulation."""
+    intervention_config = None
+    if args.knockdown_gene is not None:
+        intervention_config = {"knockdown_X": args.knockdown_gene}
+
     traj = run_simulation(
         seed=args.seed,
         save_path=args.output,
         intervention_time=args.intervention_time,
+        intervention_config=intervention_config,
     )
     print(f"Trajectory saved to {args.output}")
     print(f"  X_traj: {traj['X_traj'].shape}")
@@ -89,6 +94,13 @@ def main():
         type=int,
         default=None,
         help="Apply intervention at this time step",
+    )
+    p_run.add_argument(
+        "--knockdown-gene",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Gene indices to knockdown (state-level, single-step)",
     )
     p_run.set_defaults(func=cmd_run)
 
