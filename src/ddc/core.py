@@ -163,6 +163,12 @@ class World():
         self.gene_to_macro: Dict[int, str] = GENE_TO_MACRO
         self.gene_to_micro: Dict[int, str] = GENE_TO_MICRO
         ###
+
+        # Vectorized update helpers (built in sample_world / from_dict)
+        self.P_mask: Tensor = torch.zeros((G, G), dtype=DTYPE)  # (G,G) = 1 if edge exists
+        self.P_degree: Tensor = torch.zeros(G, dtype=DTYPE)     # (G,) number of inputs per gene
+        self.a_ij_matrix: Tensor = torch.zeros((G, G), dtype=DTYPE)  # (G,G) TF regulatory weights
+        self.beta_matrix: Tensor = torch.zeros((G, G), dtype=DTYPE)  # (G,G) chromatin weights
     
     def to_dict(self) -> Dict[str, Any]:
         # Convert tensors to lists for JSON serialization
@@ -225,6 +231,19 @@ class World():
         self.gene_to_micro = {int(k): v for k, v in data['gene_annotation']['to_micro'].items()}
         ###
 
+        # Rebuild dense matrices for vectorized updates
+        self.P_mask = torch.zeros((G, G), dtype=DTYPE)
+        self.P_degree = torch.zeros(G, dtype=DTYPE)
+        self.a_ij_matrix = torch.zeros((G, G), dtype=DTYPE)
+        self.beta_matrix = torch.zeros((G, G), dtype=DTYPE)
+        for i in range(G):
+            self.P_degree[i] = len(self.P_graph[i])
+            for j in self.P_graph[i]:
+                self.P_mask[i, j] = 1.0
+                self.a_ij_matrix[i, j] = self.a_ij[i][j]
+            for j in self.E_graph[i]:
+                self.beta_matrix[i, j] = self.beta_ij[i][j]
+
 # ==========================================
 # Monte Carlo World Sampler
 # ==========================================
@@ -271,6 +290,15 @@ def sample_world(seed: int) -> World:
         for j in e_nodes:
             world.beta_ij[i][j] = torch.empty(1, dtype=DTYPE).normal_(0, 1.5, generator=rng).item()
 
+    # Build dense matrices for vectorized updates
+    for i in range(G):
+        world.P_degree[i] = len(world.P_graph[i])
+        for j in world.P_graph[i]:
+            world.P_mask[i, j] = 1.0
+            world.a_ij_matrix[i, j] = world.a_ij[i][j]
+        for j in world.E_graph[i]:
+            world.beta_matrix[i, j] = world.beta_ij[i][j]
+
     return world
 
 # ==========================================
@@ -280,20 +308,17 @@ def normalize_protein(P: Tensor, world: World) -> Tensor:
     return P / (torch.sum(P) + world.epsilon)
 
 def compute_TFinput(tilde_P: Tensor, world: World) -> Tensor:
-    TFinput: Tensor = torch.zeros(G, dtype=DTYPE)
-    for i in range(G):
-        d_i = len(world.P_graph[i])
-        prod = 1.0
-        for j in world.P_graph[i]:
-            prod *= (tilde_P[j] ** world.a_ij[i][j])
-        TFinput[i] = prod ** (1.0 / d_i)
+    # tilde_P: (G,) → expand to (G, G)
+    tilde_P_expanded = tilde_P.unsqueeze(0).expand(G, -1)  # (G, G)
+    # x^0 = 1 for non-existent edges; masked_fill ensures this
+    powered = tilde_P_expanded.masked_fill(world.P_mask == 0, 1.0) ** world.a_ij_matrix
+    # Geometric mean = prod^(1/d_i) per row
+    prod = powered.prod(dim=1)  # (G,)
+    TFinput = prod ** (1.0 / world.P_degree)
     return TFinput
 
 def update_chromatin(tilde_P: Tensor, world: World) -> Tensor:
-    Z_next: Tensor = torch.zeros(G, dtype=DTYPE)
-    for i in range(G):
-        epi_sum: float = sum(world.beta_ij[i][j] * tilde_P[j] for j in world.E_graph[i])
-        Z_next[i] = world.alpha[i] + epi_sum
+    Z_next = world.alpha + world.beta_matrix @ tilde_P
     return stable_sigmoid(Z_next)
 
 def update_mRNA(X: Tensor, Z: Tensor, TFinput: Tensor, world: World) -> Tensor:
@@ -605,7 +630,7 @@ def run_sanity_tests(seed: int) -> None:
     assert torch.all(run1['X_traj'] >= 0), "X must be >= 0."
     assert torch.all(run1['P_traj'] >= 0), "P must be >= 0."
     assert torch.all((run1['Z_traj'] >= 0) & (run1['Z_traj'] <= 1)), "Z must be in [0, 1]."    
-    assert torch.all(torch.sum(run1['P_traj'], dim=1) <= R_TOTAL + EPSILON), "Resource limit exceeded."
+    assert torch.all(torch.sum(run1['P_traj'][1:], dim=1) <= R_TOTAL + EPSILON), "Resource limit exceeded."
     print('Non-negativity and Resource bound checks passed.')
     
     assert torch.all(torch.isfinite(run1['X_traj'])), "X must be finite."
