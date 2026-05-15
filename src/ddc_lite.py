@@ -248,6 +248,91 @@ def generate_dataset(
     return C, world, cell_seeds
 
 
+def compute_stability_metrics(
+    traj: Dict[str, Any],
+    eps: float = 1e-4,
+    window: int = 10,
+    collapse_threshold: float = 1e-3,
+    divergence_threshold: float = 1e3,
+) -> Dict[str, Any]:
+    X_traj: Tensor = traj['X_traj']
+    P_traj: Tensor = traj['P_traj']
+
+    max_expression: float = float(P_traj.max().item())
+    final_mean_expression: float = float(P_traj[-1].mean().item())
+
+    bounded: bool = max_expression < divergence_threshold
+
+    collapsed: bool = final_mean_expression < collapse_threshold
+
+    converged: bool = False
+    convergence_time: int = -1
+
+    t_steps: int = P_traj.shape[0] - 1
+    for t in range(t_steps - window + 1):
+        consecutive: bool = True
+        for w in range(window):
+            delta_X = float(torch.norm(X_traj[t + w + 1] - X_traj[t + w]).item())
+            delta_P = float(torch.norm(P_traj[t + w + 1] - P_traj[t + w]).item())
+            if delta_X >= eps or delta_P >= eps:
+                consecutive = False
+                break
+        if consecutive:
+            converged = True
+            convergence_time = t
+            break
+
+    return {
+        'converged': converged,
+        'convergence_time': convergence_time,
+        'bounded': bounded,
+        'collapsed': collapsed,
+        'max_expression': max_expression,
+        'final_mean_expression': final_mean_expression,
+    }
+
+
+def aggregate_stability_stats(metrics_list: List[Dict[str, Any]]) -> Dict[str, Any]:
+    total: int = len(metrics_list)
+    if total == 0:
+        return {'total_worlds': 0}
+
+    n_converged: int = sum(1 for m in metrics_list if m['converged'])
+    n_bounded: int = sum(1 for m in metrics_list if m['bounded'])
+    n_collapsed: int = sum(1 for m in metrics_list if m['collapsed'])
+
+    conv_times = [m['convergence_time'] for m in metrics_list if m['converged']]
+    mean_conv_time: float = float(sum(conv_times) / len(conv_times)) if conv_times else -1.0
+
+    return {
+        'total_worlds': total,
+        'convergence_rate': n_converged / total,
+        'bounded_rate': n_bounded / total,
+        'collapse_rate': n_collapsed / total,
+        'mean_convergence_time': mean_conv_time,
+        'n_converged': n_converged,
+        'n_bounded': n_bounded,
+        'n_collapsed': n_collapsed,
+    }
+
+
+def export_ground_truth(world: World, save_path: str) -> None:
+    ground_truth = world.to_dict()
+
+    edge_table: List[Dict[str, Any]] = []
+    for i in range(G):
+        j: int = world.P_graph[i][0]
+        edge_table.append({
+            'target': i,
+            'regulator': j,
+            'sign': 'activation' if world.edge_signs[i][j] == ACTIVATION else 'repression',
+        })
+    ground_truth['edge_table'] = edge_table
+
+    with open(save_path, 'w') as f:
+        json.dump(ground_truth, f, indent=2)
+
+
 def apply_perturbation(
     world: World,
     state: State,
