@@ -388,12 +388,26 @@ def sample_initial_state(cell_seed: int, world: World) -> Tuple[Tensor, Tensor, 
 
 def run_simulation(seed: int,
                    save_path: str = None,
+                   T: int = 200,
+                   world_seed: int = None,
                    intervention_time: int = None,
-                   intervention_config: Dict = None) -> Dict[str, Tensor]:
-    world_seed: int = seed
+                   intervention_config: Dict = None,
+                   perturbation_config: Dict = None,
+                   enable_resource_projection: bool = True) -> Dict[str, Tensor]:
+    global ENABLE_RESOURCE_PROJECTION
+    ENABLE_RESOURCE_PROJECTION = enable_resource_projection
+
+    if world_seed is None:
+        world_seed = seed
     cell_seed: int = seed + 1
 
     world: World = sample_world(world_seed)
+
+    if perturbation_config is not None:
+        dummy_state = (torch.zeros(G, dtype=DTYPE), torch.zeros(G, dtype=DTYPE),
+                       torch.zeros(G, dtype=DTYPE), 1.0)
+        world, _ = apply_perturbation(world, dummy_state, perturbation_config)
+
     X0, P0, Z0, N0 = sample_initial_state(cell_seed, world)
 
     traj: Dict[str, Tensor] = simulate_single_cell(world, X0, P0, Z0, N0, T,

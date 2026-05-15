@@ -23,8 +23,13 @@ Requires: Python 3.8+, PyTorch 2.0+, NumPy 1.20+
 ## CLI
 
 ```bash
-# Run simulation
+# Run simulation (all adjustable parameters shown)
 ddc run --seed 42 --output ./traj.pt
+ddc run --seed 42 --T 500 --output ./traj.pt              # custom timesteps
+ddc run --seed 42 --world-seed 0 --output ./traj.pt     # separate world/cell seeds
+ddc run --seed 42 --knockout-gene 0 1 --output ./traj.pt # gene knockout (persistent)
+ddc run --seed 42 --knockdown-gene 0 --intervention-time 50 --output ./traj.pt  # knockdown (single-step)
+ddc run --seed 42 --disable-resource-projection --output ./traj.pt  # disable ΣP ≤ R_total
 
 # Generate multi-cell dataset
 ddc dataset --world-seed 0 --M 100 --output dataset.pt
@@ -38,6 +43,19 @@ ddc smoke-test
 # Sanity tests
 ddc sanity
 ```
+
+### `ddc run` — Parameter Reference
+
+| CLI Parameter | Default | Description |
+|--------------|---------|-------------|
+| `--seed` | *required* | Random seed for cell initial state |
+| `--output` | *required* | Output `.pt` file path |
+| `--T` | 200 | Simulation timesteps |
+| `--world-seed` | same as `--seed` | Random seed for gene network world |
+| `--intervention-time` | None | Apply state-level intervention at this timestep |
+| `--knockdown-gene` | None | Gene indices for knockdown (X_i=0, single-step) |
+| `--knockout-gene` | None | Gene indices for knockout (rho_i=0, persistent) |
+| `--disable-resource-projection` | False | Disable ΣP ≤ R_total resource constraint |
 
 ## Python API
 
@@ -81,6 +99,36 @@ normalize_protein → TFinput → Z → X → P_raw → projection → N
 ### Perturbation vs Intervention
 - **Perturbation**: parameter-level (e.g., `rho=0` for knockout), persistent
 - **Intervention**: state-level (e.g., `X_i=0`), single-step
+
+### Simulation Parameters (Hardcoded Defaults)
+
+The following parameters are currently hardcoded in `src/ddc/core.py`. They are documented here for reference; adjust them in code or via the Python API.
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `G` | 50 | Number of genes |
+| `T` | 200 | Default simulation timesteps |
+| `R_TOTAL` | 1.0 | Total protein resource capacity |
+| `K_POP` | 1.0 | Cell population carrying capacity |
+| `EPSILON` | 1e-8 | Numerical stability constant |
+| `DTYPE` | float64 | Tensor data type |
+| `ENABLE_RESOURCE_PROJECTION` | True | Resource constraint toggle |
+| `A_IJ_RANGE` | (0.5, 2.0) | Regulatory interaction strength range |
+
+**World sampling ranges** (set in `sample_world()`):
+
+| Parameter | Range | Description |
+|-----------|-------|-------------|
+| `alpha` | N(0, 1) | Basal transcription rate |
+| `rho` | U(0.5, 2.0) | Transcription efficiency |
+| `K` | U(0.1, 1.0) / G | Hill function half-saturation |
+| `n` | 2.0 (fixed) | Hill coefficient |
+| `delta_x` | U(0.1, 0.5) | mRNA degradation rate |
+| `delta_p` | U(0.05, 0.3) | Protein degradation rate |
+| `gamma` | 1.0 (fixed) | Translation efficiency |
+| `r` | U(0.05, 0.2) | Cell growth rate |
+| `a_ij` | U(0.5, 2.0) | TF-mediated regulatory strength |
+| `beta_ij` | N(0, 1.5) | Chromatin interaction strength |
 
 ## Output Format
 

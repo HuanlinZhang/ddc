@@ -30,11 +30,19 @@ def cmd_run(args):
     if args.knockdown_gene is not None:
         intervention_config = {"knockdown_X": args.knockdown_gene}
 
+    perturbation_config = None
+    if args.knockout_gene is not None:
+        perturbation_config = {"knockout": args.knockout_gene}
+
     traj = run_simulation(
         seed=args.seed,
         save_path=args.output,
+        T=args.T,
+        world_seed=args.world_seed,
         intervention_time=args.intervention_time,
         intervention_config=intervention_config,
+        perturbation_config=perturbation_config,
+        enable_resource_projection=not args.disable_resource_projection,
     )
     print(f"Trajectory saved to {args.output}")
     print(f"  X_traj: {traj['X_traj'].shape}")
@@ -87,8 +95,20 @@ def main():
 
     # ddc run
     p_run = sub.add_parser("run", help="Run single-cell simulation")
-    p_run.add_argument("--seed", type=int, required=True, help="Random seed")
+    p_run.add_argument("--seed", type=int, required=True, help="Random seed for cell initial state")
     p_run.add_argument("--output", type=str, required=True, help="Output .pt file path")
+    p_run.add_argument(
+        "--T",
+        type=int,
+        default=200,
+        help="Number of simulation timesteps (default: 200)",
+    )
+    p_run.add_argument(
+        "--world-seed",
+        type=int,
+        default=None,
+        help="Random seed for gene network world (default: same as --seed)",
+    )
     p_run.add_argument(
         "--intervention-time",
         type=int,
@@ -101,6 +121,19 @@ def main():
         nargs="+",
         default=None,
         help="Gene indices to knockdown (state-level, single-step)",
+    )
+    p_run.add_argument(
+        "--knockout-gene",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Gene indices to knockout (parameter-level, persistent, rho_i=0)",
+    )
+    p_run.add_argument(
+        "--disable-resource-projection",
+        action="store_true",
+        default=False,
+        help="Disable resource constraint (ΣP ≤ R_total)",
     )
     p_run.set_defaults(func=cmd_run)
 
