@@ -35,10 +35,10 @@ def cmd_run(args):
         perturbation_config = {"knockout": args.knockout_gene}
 
     traj = run_simulation(
-        seed=args.seed,
+        world_seed=args.seed,
         save_path=args.output,
         T=args.T,
-        world_seed=args.world_seed,
+        cell_seed=args.cell_seed,
         intervention_time=args.intervention_time,
         intervention_config=intervention_config,
         perturbation_config=perturbation_config,
@@ -95,7 +95,7 @@ def main():
 
     # ddc run
     p_run = sub.add_parser("run", help="Run single-cell simulation")
-    p_run.add_argument("--seed", type=int, required=True, help="Random seed for cell initial state")
+    p_run.add_argument("--seed", type=int, required=True, help="Random seed for gene network world")
     p_run.add_argument("--output", type=str, required=True, help="Output .pt file path")
     p_run.add_argument(
         "--T",
@@ -104,10 +104,10 @@ def main():
         help="Number of simulation timesteps (default: 200)",
     )
     p_run.add_argument(
-        "--world-seed",
+        "--cell-seed",
         type=int,
         default=None,
-        help="Random seed for gene network world (default: same as --seed)",
+        help="Random seed for cell initial state (default: --seed + 1)",
     )
     p_run.add_argument(
         "--intervention-time",

@@ -25,9 +25,9 @@ Requires: Python 3.8+, PyTorch 2.0+, NumPy 1.20+
 ```bash
 # Run simulation (all adjustable parameters shown)
 ddc run --seed 42 --output ./traj.pt
-ddc run --seed 42 --T 500 --output ./traj.pt              # custom timesteps
-ddc run --seed 42 --world-seed 0 --output ./traj.pt     # separate world/cell seeds
-ddc run --seed 42 --knockout-gene 0 1 --output ./traj.pt # gene knockout (persistent)
+ddc run --seed 42 --T 500 --output ./traj.pt                    # custom timesteps
+ddc run --seed 42 --cell-seed 100 --output ./traj.pt           # separate cell seed
+ddc run --seed 42 --knockout-gene 0 1 --output ./traj.pt       # gene knockout (persistent)
 ddc run --seed 42 --knockdown-gene 0 --intervention-time 50 --output ./traj.pt  # knockdown (single-step)
 ddc run --seed 42 --disable-resource-projection --output ./traj.pt  # disable ΣP ≤ R_total
 
@@ -48,10 +48,10 @@ ddc sanity
 
 | CLI Parameter | Default | Description |
 |--------------|---------|-------------|
-| `--seed` | *required* | Random seed for cell initial state |
+| `--seed` | *required* | Random seed for gene network world |
 | `--output` | *required* | Output `.pt` file path |
 | `--T` | 200 | Simulation timesteps |
-| `--world-seed` | same as `--seed` | Random seed for gene network world |
+| `--cell-seed` | `--seed` + 1 | Random seed for cell initial state |
 | `--intervention-time` | None | Apply state-level intervention at this timestep |
 | `--knockdown-gene` | None | Gene indices for knockdown (X_i=0, single-step) |
 | `--knockout-gene` | None | Gene indices for knockout (rho_i=0, persistent) |
@@ -62,9 +62,12 @@ ddc sanity
 ```python
 from ddc import run_simulation, generate_dataset, sample_world
 
-# Single-cell simulation
-traj = run_simulation(seed=42, save_path='./traj.pt')
+# Single-cell simulation (world_seed=42, cell_seed defaults to 43)
+traj = run_simulation(world_seed=42, save_path='./traj.pt')
 # traj: X_traj, P_traj, Z_traj, N_traj
+
+# With explicit cell seed
+traj = run_simulation(world_seed=42, cell_seed=100, save_path='./traj.pt')
 
 # Multi-cell dataset
 dataset, world = generate_dataset(world_seed=0, M=100, save_path='./dataset.pt')

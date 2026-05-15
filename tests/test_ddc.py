@@ -27,8 +27,8 @@ class TestReproducibility:
     """Test that same seed produces identical results."""
 
     def test_run_simulation_reproducibility(self):
-        traj1 = run_simulation(seed=42)
-        traj2 = run_simulation(seed=42)
+        traj1 = run_simulation(world_seed=42)
+        traj2 = run_simulation(world_seed=42)
         for key in ["X_traj", "P_traj", "Z_traj", "N_traj"]:
             assert torch.equal(traj1[key], traj2[key]), f"{key} differs between runs"
 
@@ -72,7 +72,7 @@ class TestStability:
     """Test that values remain finite over full simulation."""
 
     def test_full_trajectory_finite(self):
-        traj = run_simulation(seed=99)
+        traj = run_simulation(world_seed=99)
         for key in ["X_traj", "P_traj", "Z_traj", "N_traj"]:
             assert torch.all(torch.isfinite(traj[key])), f"{key} contains non-finite values"
 

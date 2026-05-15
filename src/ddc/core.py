@@ -386,10 +386,10 @@ def sample_initial_state(cell_seed: int, world: World) -> Tuple[Tensor, Tensor, 
 
     return X0, P0, Z0, N0
 
-def run_simulation(seed: int,
+def run_simulation(world_seed: int,
                    save_path: str = None,
                    T: int = 200,
-                   world_seed: int = None,
+                   cell_seed: int = None,
                    intervention_time: int = None,
                    intervention_config: Dict = None,
                    perturbation_config: Dict = None,
@@ -397,9 +397,8 @@ def run_simulation(seed: int,
     global ENABLE_RESOURCE_PROJECTION
     ENABLE_RESOURCE_PROJECTION = enable_resource_projection
 
-    if world_seed is None:
-        world_seed = seed
-    cell_seed: int = seed + 1
+    if cell_seed is None:
+        cell_seed = world_seed + 1
 
     world: World = sample_world(world_seed)
 
