@@ -2,6 +2,28 @@
 
 All notable changes to DDC are documented here.
 
+## [1.1.0] — 2026-05-16
+
+### Added
+- CLI `--T` — simulation timesteps (default 200)
+- CLI `--cell-seed` — cell initial state seed (default world_seed + 1)
+- CLI `--knockout-gene` — parameter-level gene knockout (rho_i=0, persistent)
+- CLI `--disable-resource-projection` — disable ΣP ≤ R_total constraint
+- `run_simulation()` Python API: `world_seed`, `cell_seed`, `T`, `perturbation_config`, `enable_resource_projection` parameters
+
+### Changed
+- `run_simulation()`: `seed` param renamed to `world_seed`, `cell_seed` derived as `world_seed + 1` by default
+- CLI `--seed` semantics clarified: now always represents world seed (not cell seed)
+- `compute_TFinput`: vectorized (12x speedup, ~1ms/step → 0.04ms/step)
+- `update_chromatin`: vectorized with matrix multiply (@)
+- `sample_world()` / `from_dict()`: build dense P_mask, P_degree, a_ij_matrix, beta_matrix tensors
+
+### Fixed
+- Sanity test: skip step 0 in resource bound check (P0 intentionally unprojected per spec)
+
+### Performance
+- T=200 single-cell simulation: 0.47s → 0.037s (12.7x faster, CPU single-thread)
+
 ## [1.0.0] — 2026-05-16
 
 ### Added
