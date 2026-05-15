@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ddc"
+version = "0.1.0"
+description = "Designed Digital Cell - Gene regulatory network simulator"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "zhanghl"}
+]
+requires-python = ">=3.8"
+dependencies = [
+    "torch>=2.0.0",
+    "numpy>=1.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+ddc = "ddc.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/HuanlinZhang/ddc"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"

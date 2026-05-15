@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Output / data
+runs/
+test/
+test_convergence/
+src/data/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Claude
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
