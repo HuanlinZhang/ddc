@@ -27,7 +27,7 @@ from ddc.core import (
 )
 
 __version__ = "1.1.0"
-__author__ = "zhanghl"
+__author__ = "Huanlin Zhang and Yixin Zhao"
 
 __all__ = [
     "sample_world",
