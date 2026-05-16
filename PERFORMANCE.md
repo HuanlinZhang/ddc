@@ -25,13 +25,19 @@ Single-cell simulation (M=1, CPU, T varying):
 | M | CPU Time | CPU Speed | GPU Time | GPU Speed | GPU Speedup |
 |---|---------|-----------|---------|-----------|-------------|
 | 100 | 0.59s | 170 cells/sec | 1.05s | 95 cells/sec | 0.6x (GPU slower) |
-| 1000 | 4.95s | 202 cells/sec | 1.85s | 540 cells/sec | 2.7x |
-| 10000 | 54.56s | 183 cells/sec | 16.46s | 608 cells/sec | **3.3x** |
+| 1,000 | 4.95s | 202 cells/sec | 1.85s | 540 cells/sec | 2.7x |
+| 10,000 | 54.56s | 183 cells/sec | 16.46s | 608 cells/sec | **3.3x** |
+| 20,000 | 106.7s | 187 cells/sec | 32.6s | 614 cells/sec | **3.3x** |
+| 50,000 | 267.4s | 187 cells/sec | 112.2s | 446 cells/sec | **2.4x** |
+| 100,000 | — | — | OOM killed | — | — |
 
 ### Key Findings
 - **M < ~200**: CPU faster (GPU overhead exceeds compute time)
-- **M ≥ 1000**: GPU 2.7-3.3x faster
-- **M=10000**: GPU 3.3x speedup (608 vs 183 cells/sec)
+- **M ≥ 1,000**: GPU 2.4-3.3x faster
+- **M=10,000-20,000**: GPU 3.3x speedup (peak, RTX 3060 VRAM ~6.4GB)
+- **M=50,000**: GPU speedup drops to 2.4x (GPU RAM exhausted, spills to system RAM)
+- **M=100,000**: OOM killed on this machine (16GB RAM insufficient)
+- CPU throughput is constant ~185-200 cells/sec regardless of M (bandwidth-bound)
 
 ### Multiprocessing CPU (M=1000, T=400, for comparison):
 
