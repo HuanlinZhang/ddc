@@ -1,8 +1,17 @@
 # Performance & Optimization Log
 
+## Benchmark Environment
+
+**Test date**: 2026-05-16
+
+**CPU**: Intel Core i7-11800H @ 2.30GHz (8 cores, 16 threads)
+**GPU**: NVIDIA GeForce RTX 3060 Laptop GPU, 6.4 GB VRAM, compute 8.6
+**PyTorch**: 2.4.1+cu121
+**Python**: 3.10
+
 ## v1.2 Benchmark Results
 
-Single-cell simulation, CPU single-thread:
+Single-cell simulation (M=1, CPU, T varying):
 
 | T (timesteps) | Time | Throughput |
 |----------------|------|------------|
@@ -11,30 +20,27 @@ Single-cell simulation, CPU single-thread:
 | 500 | 0.084s | — |
 | 1000 | 0.174s | — |
 
-Batch simulation (CPU, M cells, T=400):
+### Batch Simulation: CPU vs GPU (T=400)
 
-| M | Time | Speed |
-|---|------|-------|
-| 100 | 0.53s | 189 cells/sec |
-| 1000 | 5.2s | 192 cells/sec |
+| M | CPU Time | CPU Speed | GPU Time | GPU Speed | GPU Speedup |
+|---|---------|-----------|---------|-----------|-------------|
+| 100 | 0.59s | 170 cells/sec | 1.05s | 95 cells/sec | 0.6x (GPU slower) |
+| 1000 | 4.95s | 202 cells/sec | 1.85s | 540 cells/sec | 2.7x |
+| 10000 | 54.56s | 183 cells/sec | 16.46s | 608 cells/sec | **3.3x** |
 
-Batch simulation (GPU, RTX 3060 Laptop, M cells, T=400):
+### Key Findings
+- **M < ~200**: CPU faster (GPU overhead exceeds compute time)
+- **M ≥ 1000**: GPU 2.7-3.3x faster
+- **M=10000**: GPU 3.3x speedup (608 vs 183 cells/sec)
 
-| M | Time | Speed |
-|---|------|-------|
-| 100 | 0.38s | 263 cells/sec |
-| 1000 | 2.9s | 345 cells/sec |
-
-**Note**: At current gene count (G=50) and batch size (M≤1000), GPU speedup over CPU is modest (~1.5-1.8x). GPU acceleration becomes significant with larger G or M.
-
-Multiprocessing CPU (M=1000, T=400):
+### Multiprocessing CPU (M=1000, T=400, for comparison):
 
 | n_jobs | Time | Speed |
 |---------|------|-------|
 | 1 | 33s | 30 cells/sec |
 | 4 | 13s | 76 cells/sec |
 
-**Recommendation**: Use batch simulation (`M>1`) over multiprocessing for M≥100. Batch CPU is 2.5x faster than multiprocessing n_jobs=4.
+**Recommendation**: Use batch simulation (`M>1`) over multiprocessing for M≥100. Batch CPU (202 cells/sec) is 2.7x faster than multiprocessing n_jobs=4 (76 cells/sec).
 
 ## Optimization History
 
