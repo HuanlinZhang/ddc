@@ -51,7 +51,9 @@ ddc sanity
 | `--seed` | *required* | Random seed for gene network world |
 | `--output` | *required* | Output `.pt` file path |
 | `--T` | 200 | Simulation timesteps |
+| `--M` | 1 | Number of cells to simulate in batch (>1 uses vectorized batch path) |
 | `--cell-seed` | `--seed` + 1 | Random seed for cell initial state |
+| `--device` | auto | Device: `auto` (GPU if available), `cuda`, `cpu` |
 | `--intervention-time` | None | Apply state-level intervention at this timestep |
 | `--knockdown-gene` | None | Gene indices for knockdown (X_i=0, single-step) |
 | `--knockout-gene` | None | Gene indices for knockout (rho_i=0, persistent) |
@@ -64,14 +66,19 @@ from ddc import run_simulation, generate_dataset, sample_world
 
 # Single-cell simulation (world_seed=42, cell_seed defaults to 43)
 traj = run_simulation(world_seed=42, save_path='./traj.pt')
-# traj: X_traj, P_traj, Z_traj, N_traj
+# traj['X_traj']: (T+1, G)
 
-# With explicit cell seed
-traj = run_simulation(world_seed=42, cell_seed=100, save_path='./traj.pt')
+# Batch simulation (auto-detects GPU, falls back to CPU)
+traj = run_simulation(world_seed=42, T=200, M=100, save_path='./batch.pt')
+# traj['X_traj']: (M, T+1, G)
+
+# Explicit device
+traj = run_simulation(world_seed=42, T=200, M=100, device='cpu')   # CPU batch
+traj = run_simulation(world_seed=42, T=200, M=100, device='cuda')  # GPU batch
 
 # Multi-cell dataset
 dataset, world = generate_dataset(world_seed=0, M=100, save_path='./dataset.pt')
-# dataset: (M, 50), world: World object
+# dataset: (M, G), world: World object
 ```
 
 ## Architecture

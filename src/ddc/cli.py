@@ -44,6 +44,7 @@ def cmd_run(args):
         intervention_config=intervention_config,
         perturbation_config=perturbation_config,
         enable_resource_projection=not args.disable_resource_projection,
+        device=args.device,
     )
     print(f"Trajectory saved to {args.output}")
     print(f"  X_traj: {traj['X_traj'].shape}  (M, T+1, G)")
@@ -142,6 +143,13 @@ def main():
         action="store_true",
         default=False,
         help="Disable resource constraint (ΣP ≤ R_total)",
+    )
+    p_run.add_argument(
+        "--device",
+        type=str,
+        default="auto",
+        choices=["auto", "cuda", "cpu"],
+        help="Device for batch simulation: auto (GPU if available), cuda, cpu (default: auto)",
     )
     p_run.set_defaults(func=cmd_run)
 

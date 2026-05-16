@@ -497,9 +497,23 @@ def run_simulation(world_seed: int,
                    intervention_time: int = None,
                    intervention_config: Dict = None,
                    perturbation_config: Dict = None,
-                   enable_resource_projection: bool = True) -> Dict[str, Tensor]:
+                   enable_resource_projection: bool = True,
+                   device: str = 'cuda') -> Dict[str, Tensor]:
+    """
+    Run simulation with optional GPU acceleration.
+
+    Args:
+        device: 'cuda', 'cpu', or 'auto' (default 'cuda').
+            'auto' uses CUDA if available, otherwise CPU.
+    """
     global ENABLE_RESOURCE_PROJECTION
     ENABLE_RESOURCE_PROJECTION = enable_resource_projection
+
+    # Resolve device
+    if device == 'auto':
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    elif device == 'cuda' and not torch.cuda.is_available():
+        device = 'cpu'
 
     if cell_seed is None:
         cell_seed = world_seed + 1
@@ -512,7 +526,7 @@ def run_simulation(world_seed: int,
         world, _ = apply_perturbation(world, dummy_state, perturbation_config)
 
     if M == 1:
-        # Single-cell mode — use scalar path
+        # Single-cell mode — scalar path (CPU only for now)
         X0, P0, Z0, N0 = sample_initial_state(cell_seed, world)
         traj: Dict[str, Tensor] = simulate_single_cell(world, X0, P0, Z0, N0, T,
                                                         intervention_time=intervention_time,
@@ -522,12 +536,25 @@ def run_simulation(world_seed: int,
         rng = torch.Generator()
         rng.manual_seed(cell_seed)
         X0 = torch.rand((M, G), dtype=DTYPE, generator=rng)
-        P0_raw = world.gamma * X0
-        P0 = P0_raw
+        P0 = world.gamma * X0
         Z0 = stable_sigmoid(world.alpha).unsqueeze(0).expand(M, -1)
         N0 = torch.full((M,), 1.0, dtype=DTYPE)
 
+        if device == 'cuda':
+            # Move world matrices and inputs to GPU
+            for attr in ['P_mask', 'a_ij_matrix', 'P_degree', 'beta_matrix',
+                         'alpha', 'rho', 'K', 'n', 'delta_x', 'delta_p', 'gamma']:
+                setattr(world, attr, getattr(world, attr).cuda())
+            X0 = X0.cuda()
+            P0 = P0.cuda()
+            Z0 = Z0.cuda()
+            N0 = N0.cuda()
+
         traj = simulate_batch(world, X0, P0, Z0, N0, T)
+
+        if device == 'cuda':
+            # Move results back to CPU for storage and compatibility
+            traj = {k: v.cpu() for k, v in traj.items()}
 
     if save_path is not None:
         torch.save({

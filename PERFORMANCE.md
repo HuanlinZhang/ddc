@@ -1,6 +1,6 @@
 # Performance & Optimization Log
 
-## v1.1.0 Benchmark Results
+## v1.2 Benchmark Results
 
 Single-cell simulation, CPU single-thread:
 
@@ -11,18 +11,39 @@ Single-cell simulation, CPU single-thread:
 | 500 | 0.084s | — |
 | 1000 | 0.174s | — |
 
-Multi-cell dataset generation (M=1000, T=400, 8-core server):
+Batch simulation (CPU, M cells, T=400):
+
+| M | Time | Speed |
+|---|------|-------|
+| 100 | 0.53s | 189 cells/sec |
+| 1000 | 5.2s | 192 cells/sec |
+
+Batch simulation (GPU, RTX 3060 Laptop, M cells, T=400):
+
+| M | Time | Speed |
+|---|------|-------|
+| 100 | 0.38s | 263 cells/sec |
+| 1000 | 2.9s | 345 cells/sec |
+
+**Note**: At current gene count (G=50) and batch size (M≤1000), GPU speedup over CPU is modest (~1.5-1.8x). GPU acceleration becomes significant with larger G or M.
+
+Multiprocessing CPU (M=1000, T=400):
 
 | n_jobs | Time | Speed |
 |---------|------|-------|
 | 1 | 33s | 30 cells/sec |
 | 4 | 13s | 76 cells/sec |
-| 8 | 14s | 73 cells/sec |
-| 12 | 17s | 60 cells/sec |
 
-**Recommendation**: use `n_jobs=4` — 2.6x speedup, beyond that yields no gain or slowdown.
+**Recommendation**: Use batch simulation (`M>1`) over multiprocessing for M≥100. Batch CPU is 2.5x faster than multiprocessing n_jobs=4.
 
 ## Optimization History
+
+### v1.2 — GPU Batch Simulation (2026-05-16)
+- `simulate_batch()`: vectorized batch simulation accepting `(M, G)` inputs, returns `(M, T+1, G)` trajectories
+- `run_simulation()`: add `M` param (default 1) and `device` param (`'auto'|'cuda'|'cpu'`)
+- Auto-detects CUDA, gracefully falls back to CPU if unavailable
+- CPU vs GPU produce bit-identical results (max_diff=0)
+- CLI: add `--M` and `--device` flags
 
 ### v1.1.0 — Vectorized Updates (2026-05-16)
 - `compute_TFinput`: Python for-loop → tensor ops (`**` + `masked_fill` + `prod(dim=1)`)
@@ -34,19 +55,59 @@ Multi-cell dataset generation (M=1000, T=400, 8-core server):
 - Single-cell T=200: 0.47s → 0.037s (**13x faster**)
 - Added multiprocessing via `--n-jobs` (up to 2.6x on 4 cores)
 
+---
+
+## Batch Simulation — Design
+
+### API
+
+```python
+# Single-cell (backward compatible, M=1, CPU)
+traj = run_simulation(world_seed=42, T=200)
+# X_traj: (T+1, G)
+
+# Batch (CPU or GPU auto-detected)
+traj = run_simulation(world_seed=42, T=200, M=100)
+# X_traj: (M, T+1, G)
+
+# Explicit device
+traj = run_simulation(world_seed=42, T=200, M=100, device='cuda')   # GPU
+traj = run_simulation(world_seed=42, T=200, M=100, device='cpu')    # CPU
+traj = run_simulation(world_seed=42, T=200, M=100, device='auto')  # auto-detect (default)
+```
+
+### CLI
+
+```bash
+# Auto-detect GPU (default)
+ddc run --seed 42 --M 1000 --output traj.pt
+
+# Force CPU
+ddc run --seed 42 --M 1000 --device cpu --output traj.pt
+
+# Force GPU
+ddc run --seed 42 --M 1000 --device cuda --output traj.pt
+```
+
+### Design Principles
+1. **Auto-detection by default**: `device='auto'` uses CUDA if available, else CPU
+2. **Backward compatible**: `M=1` (default) uses scalar path, result shapes unchanged
+3. **Identical results**: CPU and GPU produce bit-identical trajectories (max_diff=0)
+4. **Graceful fallback**: if CUDA requested but unavailable, falls back to CPU silently
+
 ## Next Steps (Ideas)
 
 ### High Priority
-1. **GPU batch simulation**: modify `simulate_single_cell` to accept batched initial states, output `(M, T+1, G)` tensor — single instruction multiple data on GPU. Potential 10-100x speedup for large M.
+1. **snakemake pipeline**: integrate ddc into a reproducible analysis workflow in `ddc-analysis` repo.
 
-2. **snakemake pipeline**: integrate ddc into a reproducible analysis workflow in `ddc-analysis` repo.
+2. **Larger G or M for GPU saturation**: current G=50 is too small for GPU to shine. GPU acceleration becomes significant at G≥500 or M≥10000.
 
 ### Medium Priority
-3. **Batch `simulate_single_cell`**: refactor main loop to accept `X0, P0, Z0` as `(M, G)` tensors — GPU acceleration without changing the scalar simulation function.
+3. **World graph stats**: expose network statistics (in-degree distribution, edge density, etc.) for analysis.
 
-4. **World graph stats**: expose network statistics (in-degree distribution, edge density, etc.) for analysis.
+4. **Checkpointing**: save intermediate trajectory snapshots for long T simulations.
 
-5. **Checkpointing**: save intermediate trajectory snapshots for long T simulations.
+5. **Single-cell GPU**: accelerate M=1 path on GPU (currently CPU only).
 
 ### Low Priority / Experimental
 6. **JIT compilation**: `torch.compile()` on the update functions for additional speedup.
@@ -54,50 +115,3 @@ Multi-cell dataset generation (M=1000, T=400, 8-core server):
 7. **Mixed precision**: `float32` for intermediate computations, `float64` only for final output — faster on GPU.
 
 8. **Adaptive T**: detect convergence and stop early instead of fixed T steps.
-
----
-
-## GPU Batch Simulation — Design (v1.2)
-
-### Goal
-Support batch simulation on GPU while remaining backward-compatible with CPU-only servers.
-
-### Design Principles
-1. **Auto-detection**: `torch.cuda.is_available()` decides whether to use GPU
-2. **Zero API change**: existing code (`run_simulation(world_seed=42)`) continues to work unchanged
-3. **Opt-in batch**: new `M` parameter enables batch mode for multi-cell simulations
-4. **Graceful fallback**: if GPU unavailable in batch mode, fallback to CPU multiprocessing
-
-### API Changes
-
-```python
-# Existing API — unchanged, works on CPU or GPU
-traj = run_simulation(world_seed=42, T=500)
-# traj: {'X_traj': (T+1, G), ...}
-
-# New batch API — GPU-accelerated when available
-traj = run_simulation(world_seed=42, T=500, M=100)
-# traj: {'X_traj': (M, T+1, G), 'P_traj': (M, T+1, G), ...}
-```
-
-### Implementation Plan
-
-#### Layer 1: Vectorized per-timestep functions (already done in v1.1.0)
-- `compute_TFinput`: works on `(M, G)` batched tensors natively
-- `update_chromatin`: `beta_matrix @ tilde_P.T` → `.T` gives `(M, G)`
-- All per-step functions are already broadcast-compatible
-
-#### Layer 2: `simulate_batch(world, X0, P0, Z0, N0, t_steps)` → `(M, T+1, G)`
-- Refactor main loop to handle `(M, G)` tensors per step
-- Each step processes all M cells simultaneously
-- GPU tensor operations = M-way parallelism per step
-
-#### Layer 3: `run_simulation()` adds `M` parameter
-- `M=1` (default): calls scalar `simulate_single_cell`, result shapes match current API
-- `M>1`: calls `simulate_batch`
-  - GPU available → GPU batch (fastest)
-  - GPU unavailable → CPU multiprocessing (existing path)
-
-#### Backward Compatibility
-- `ddc run --seed 42` works exactly as before
-- `generate_dataset()` continues to work, may use batch internally in future
