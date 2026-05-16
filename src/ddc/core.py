@@ -393,6 +393,84 @@ def simulate_single_cell(world: World, X0: Tensor, P0: Tensor, Z0: Tensor, N0: f
         X_traj[t+1], P_traj[t+1], Z_traj[t+1], N_traj[t+1] = X, P, Z, N
     return  {'X_traj': X_traj, 'P_traj': P_traj, 'Z_traj': Z_traj, 'N_traj': N_traj}
 
+
+# ==========================================
+# Batch Simulation (GPU-ready)
+# ==========================================
+def simulate_batch(world: World,
+                  X0: Tensor,
+                  P0: Tensor,
+                  Z0: Tensor,
+                  N0: Tensor,
+                  t_steps: int) -> Dict[str, Tensor]:
+    """
+    Batch single-cell simulation — all M cells run simultaneously.
+
+    Accepts batched initial states (M, G) and returns batched trajectories (M, T+1, G).
+
+    Args:
+        world: World object (same world for all M cells)
+        X0: Tensor (M, G) — mRNA initial state
+        P0: Tensor (M, G) — protein initial state
+        Z0: Tensor (M, G) — chromatin initial state
+        N0: Tensor (M,) — cell population counts
+        t_steps: number of simulation timesteps
+
+    Returns:
+        X_traj: Tensor (M, T+1, G)
+        P_traj: Tensor (M, T+1, G)
+        Z_traj: Tensor (M, T+1, G)
+        N_traj: Tensor (M, T+1)
+    """
+    M = X0.shape[0]
+    X, P, Z, N = X0.clone(), P0.clone(), Z0.clone(), N0.clone()
+
+    X_traj = torch.zeros((M, t_steps+1, G), dtype=DTYPE)
+    P_traj = torch.zeros((M, t_steps+1, G), dtype=DTYPE)
+    Z_traj = torch.zeros((M, t_steps+1, G), dtype=DTYPE)
+    N_traj = torch.zeros((M, t_steps+1), dtype=DTYPE)
+
+    X_traj[:, 0, :], P_traj[:, 0, :], Z_traj[:, 0, :], N_traj[:, 0] = X, P, Z, N
+
+    # Pre-expand world matrices for batch dimension
+    P_mask_m = world.P_mask.unsqueeze(0).expand(M, -1, -1)
+    a_ij_m = world.a_ij_matrix.unsqueeze(0).expand(M, -1, -1)
+    P_degree_m = world.P_degree.unsqueeze(0).expand(M, -1)
+    beta_m = world.beta_matrix.unsqueeze(0).expand(M, -1, -1)
+    alpha_m = world.alpha.unsqueeze(0).expand(M, -1)
+    rho_m = world.rho.unsqueeze(0).expand(M, -1)
+    K_m = world.K.unsqueeze(0).expand(M, -1)
+    n_m = world.n.unsqueeze(0).expand(M, -1)
+    delta_x_m = world.delta_x.unsqueeze(0).expand(M, -1)
+    delta_p_m = world.delta_p.unsqueeze(0).expand(M, -1)
+    gamma_m = world.gamma.unsqueeze(0).expand(M, -1)
+
+    for t in range(t_steps):
+        tilde_P = P / (P.sum(dim=1, keepdim=True) + world.epsilon)
+
+        tilde_P_exp = tilde_P.unsqueeze(2).expand(M, G, G)
+        powered = tilde_P_exp.masked_fill(P_mask_m == 0, 1.0) ** a_ij_m
+        prod = powered.prod(dim=2)
+        TFinput = prod ** (1.0 / P_degree_m)
+
+        Z_next = stable_sigmoid(alpha_m + (beta_m * tilde_P.unsqueeze(1)).sum(dim=2))
+
+        hill = (TFinput ** n_m) / (K_m ** n_m + TFinput ** n_m)
+        X_next = (1.0 - delta_x_m) * X + Z * rho_m * hill
+
+        P_next_raw = (1.0 - delta_p_m) * P + gamma_m * X
+        total_P = P_next_raw.sum(dim=1, keepdim=True)
+        P_next = P_next_raw * (world.R_total / total_P).masked_fill(total_P <= world.R_total, 1.0)
+
+        N_next = N + world.r * N * (1.0 - N / world.K_pop)
+
+        X, P, Z, N = X_next, P_next, Z_next, N_next
+        X_traj[:, t+1, :], P_traj[:, t+1, :], Z_traj[:, t+1, :] = X, P, Z
+        N_traj[:, t+1] = N
+
+    return {'X_traj': X_traj, 'P_traj': P_traj, 'Z_traj': Z_traj, 'N_traj': N_traj}
+
+
 # ==========================================
 # Monte Carlo Wrappers (scRNA mode)
 # ==========================================
@@ -414,6 +492,7 @@ def sample_initial_state(cell_seed: int, world: World) -> Tuple[Tensor, Tensor, 
 def run_simulation(world_seed: int,
                    save_path: str = None,
                    T: int = 200,
+                   M: int = 1,
                    cell_seed: int = None,
                    intervention_time: int = None,
                    intervention_config: Dict = None,
@@ -432,11 +511,23 @@ def run_simulation(world_seed: int,
                        torch.zeros(G, dtype=DTYPE), 1.0)
         world, _ = apply_perturbation(world, dummy_state, perturbation_config)
 
-    X0, P0, Z0, N0 = sample_initial_state(cell_seed, world)
+    if M == 1:
+        # Single-cell mode — use scalar path
+        X0, P0, Z0, N0 = sample_initial_state(cell_seed, world)
+        traj: Dict[str, Tensor] = simulate_single_cell(world, X0, P0, Z0, N0, T,
+                                                        intervention_time=intervention_time,
+                                                        intervention_config=intervention_config)
+    else:
+        # Batch mode — M cells simultaneously
+        rng = torch.Generator()
+        rng.manual_seed(cell_seed)
+        X0 = torch.rand((M, G), dtype=DTYPE, generator=rng)
+        P0_raw = world.gamma * X0
+        P0 = P0_raw
+        Z0 = stable_sigmoid(world.alpha).unsqueeze(0).expand(M, -1)
+        N0 = torch.full((M,), 1.0, dtype=DTYPE)
 
-    traj: Dict[str, Tensor] = simulate_single_cell(world, X0, P0, Z0, N0, T,
-                                                      intervention_time=intervention_time,
-                                                      intervention_config=intervention_config)
+        traj = simulate_batch(world, X0, P0, Z0, N0, T)
 
     if save_path is not None:
         torch.save({

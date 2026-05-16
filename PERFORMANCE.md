@@ -54,3 +54,50 @@ Multi-cell dataset generation (M=1000, T=400, 8-core server):
 7. **Mixed precision**: `float32` for intermediate computations, `float64` only for final output — faster on GPU.
 
 8. **Adaptive T**: detect convergence and stop early instead of fixed T steps.
+
+---
+
+## GPU Batch Simulation — Design (v1.2)
+
+### Goal
+Support batch simulation on GPU while remaining backward-compatible with CPU-only servers.
+
+### Design Principles
+1. **Auto-detection**: `torch.cuda.is_available()` decides whether to use GPU
+2. **Zero API change**: existing code (`run_simulation(world_seed=42)`) continues to work unchanged
+3. **Opt-in batch**: new `M` parameter enables batch mode for multi-cell simulations
+4. **Graceful fallback**: if GPU unavailable in batch mode, fallback to CPU multiprocessing
+
+### API Changes
+
+```python
+# Existing API — unchanged, works on CPU or GPU
+traj = run_simulation(world_seed=42, T=500)
+# traj: {'X_traj': (T+1, G), ...}
+
+# New batch API — GPU-accelerated when available
+traj = run_simulation(world_seed=42, T=500, M=100)
+# traj: {'X_traj': (M, T+1, G), 'P_traj': (M, T+1, G), ...}
+```
+
+### Implementation Plan
+
+#### Layer 1: Vectorized per-timestep functions (already done in v1.1.0)
+- `compute_TFinput`: works on `(M, G)` batched tensors natively
+- `update_chromatin`: `beta_matrix @ tilde_P.T` → `.T` gives `(M, G)`
+- All per-step functions are already broadcast-compatible
+
+#### Layer 2: `simulate_batch(world, X0, P0, Z0, N0, t_steps)` → `(M, T+1, G)`
+- Refactor main loop to handle `(M, G)` tensors per step
+- Each step processes all M cells simultaneously
+- GPU tensor operations = M-way parallelism per step
+
+#### Layer 3: `run_simulation()` adds `M` parameter
+- `M=1` (default): calls scalar `simulate_single_cell`, result shapes match current API
+- `M>1`: calls `simulate_batch`
+  - GPU available → GPU batch (fastest)
+  - GPU unavailable → CPU multiprocessing (existing path)
+
+#### Backward Compatibility
+- `ddc run --seed 42` works exactly as before
+- `generate_dataset()` continues to work, may use batch internally in future

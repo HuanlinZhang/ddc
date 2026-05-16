@@ -38,6 +38,7 @@ def cmd_run(args):
         world_seed=args.seed,
         save_path=args.output,
         T=args.T,
+        M=args.M,
         cell_seed=args.cell_seed,
         intervention_time=args.intervention_time,
         intervention_config=intervention_config,
@@ -45,7 +46,7 @@ def cmd_run(args):
         enable_resource_projection=not args.disable_resource_projection,
     )
     print(f"Trajectory saved to {args.output}")
-    print(f"  X_traj: {traj['X_traj'].shape}")
+    print(f"  X_traj: {traj['X_traj'].shape}  (M, T+1, G)")
     print(f"  P_traj: {traj['P_traj'].shape}")
     print(f"  Z_traj: {traj['Z_traj'].shape}")
     print(f"  N_traj: {traj['N_traj'].shape}")
@@ -103,6 +104,12 @@ def main():
         type=int,
         default=200,
         help="Number of simulation timesteps (default: 200)",
+    )
+    p_run.add_argument(
+        "--M",
+        type=int,
+        default=1,
+        help="Number of cells to simulate in batch (default: 1, use >1 for batch GPU acceleration)",
     )
     p_run.add_argument(
         "--cell-seed",
