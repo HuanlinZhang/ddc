@@ -4,10 +4,10 @@
 
 **Test date**: 2026-05-16
 
-**Machine**: WSL2 (Windows Subsystem for Linux)
+**Machine**: Dell G15-5511 (Windows 11, WSL2)
 **CPU**: Intel Core i7-11800H @ 2.30GHz (8 cores, 16 threads)
-**RAM**: 54.9 GB total, ~48 GB available
-**GPU**: NVIDIA GeForce RTX 3060 Laptop GPU, 6.4 GB VRAM, compute 8.6, 30 multiprocessors
+**RAM**: 64.0 GB (63.7 GB usable)
+**GPU**: NVIDIA GeForce RTX 3060 Laptop GPU, 6 GB GDDR6, compute 8.6, 30 multiprocessors
 **PyTorch**: 2.4.1+cu121
 **Python**: 3.10
 
