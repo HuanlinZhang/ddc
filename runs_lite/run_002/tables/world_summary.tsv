@@ -1,0 +1,81 @@
+world_id	combo_key	topo_idx	a_min	a_max	sign_ratio	edge_density_r	decay_delta	basal_transcription_b	attractor_type	attractor_distribution	spectral_radius	converged	convergence_time	eq_magnitude	eq_sparsity	bounded	max_expression	collapsed	clipping_dominated	clipping_freq	oscillation_exists
+baseline_balanced_t000	baseline_balanced	0	0.02	0.1	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.854532	True	51.0	2.3611	0.0	True	0.995	False	False	0.0	False
+baseline_balanced_t001	baseline_balanced	1	0.02	0.1	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.8	True	45.8	2.5494	0.0	True	1.038	False	False	0.0	False
+baseline_balanced_t002	baseline_balanced	2	0.02	0.1	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.879309	True	54.6	2.5851	0.0	True	0.991	False	False	0.0	False
+baseline_balanced_t003	baseline_balanced	3	0.02	0.1	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.90139	True	58.6	2.5031	0.0	True	0.989	False	False	0.0	False
+baseline_balanced_t004	baseline_balanced	4	0.02	0.1	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.853484	True	47.8	2.3897	0.1	True	0.9972	False	False	0.099	False
+baseline_balanced_t005	baseline_balanced	5	0.02	0.1	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.892832	True	58.4	2.3972	0.05	True	1.0184	False	False	0.0488	False
+baseline_balanced_t006	baseline_balanced	6	0.02	0.1	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.897917	True	53.8	2.5512	0.15	True	1.0817	False	True	0.1477	False
+baseline_balanced_t007	baseline_balanced	7	0.02	0.1	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.871517	True	57.2	2.5569	0.0	True	1.0401	False	False	0.0	False
+baseline_balanced_t008	baseline_balanced	8	0.02	0.1	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.878643	True	55.4	2.5436	0.0	True	0.9909	False	False	0.0	False
+baseline_balanced_t009	baseline_balanced	9	0.02	0.1	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.878754	True	52.4	2.6289	0.05	True	1.0739	False	False	0.0495	False
+stress_balanced_t000	stress_balanced	0	0.1	0.3	0.5	0.1	0.2	0.1	Type E	{'Type E': 5}	1.01372	False		2.5021769889253132e+25	0.35	False	1.750251669540842e+25	False	True	0.3458	False
+stress_balanced_t001	stress_balanced	1	0.1	0.3	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.8	True	76.8	5.7919	0.35	True	3.6271	False	True	0.3483	False
+stress_balanced_t002	stress_balanced	2	0.1	0.3	0.5	0.1	0.2	0.1	Type B	{'Type B': 5}	1.072747	True	257.0	19.5952	0.25	True	11.3229	False	True	0.2489	False
+stress_balanced_t003	stress_balanced	3	0.1	0.3	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	1.052181	True	73.6	4.8877	0.2	True	3.1846	False	True	0.1994	False
+stress_balanced_t004	stress_balanced	4	0.1	0.3	0.5	0.1	0.2	0.1	Type B	{'Type B': 5}	1.006374	True	353.0	7.4835	0.3	True	4.9527	False	True	0.2988	False
+stress_balanced_t005	stress_balanced	5	0.1	0.3	0.5	0.1	0.2	0.1	Type D	{'Type D': 5}	1.08266	False		5.6118	0.25	True	4.8028	False	True	0.2195	True
+stress_balanced_t006	stress_balanced	6	0.1	0.3	0.5	0.1	0.2	0.1	Type B	{'Type B': 5}	1.073451	True	536.8	12.1483	0.3	True	6.4265	False	True	0.2984	False
+stress_balanced_t007	stress_balanced	7	0.1	0.3	0.5	0.1	0.2	0.1	Type E	{'Type E': 5}	1.070838	False		1.2384174112176779e+27	0.15	False	1.0082188015190254e+27	False	True	0.1509	False
+stress_balanced_t008	stress_balanced	8	0.1	0.3	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.96562	True	103.2	2.6192	0.1	True	1.7687	False	True	0.1014	False
+stress_balanced_t009	stress_balanced	9	0.1	0.3	0.5	0.1	0.2	0.1	Type B	{'Type B': 5}	1.113329	True	331.4	31.9557	0.2	True	19.6936	False	True	0.1995	False
+chen_moderate_balanced_t000	chen_moderate_balanced	0	0.1	0.2	0.5	0.1	0.2	0.1	Type B	{'Type B': 5}	0.957827	True	780.8	18.9391	0.2	True	10.5722	False	True	0.1967	False
+chen_moderate_balanced_t001	chen_moderate_balanced	1	0.1	0.2	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.8	True	62.6	4.1838	0.4	True	2.7031	False	True	0.3961	False
+chen_moderate_balanced_t002	chen_moderate_balanced	2	0.1	0.2	0.5	0.1	0.2	0.1	Type B	{'Type B': 5}	1.018834	True	234.4	10.7977	0.25	True	5.4918	False	True	0.2473	False
+chen_moderate_balanced_t003	chen_moderate_balanced	3	0.1	0.2	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	1.007093	True	70.2	3.7008	0.15	True	1.8952	False	True	0.1493	False
+chen_moderate_balanced_t004	chen_moderate_balanced	4	0.1	0.2	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.958648	True	156.2	2.9033	0.2	True	1.5377	False	True	0.2022	False
+chen_moderate_balanced_t005	chen_moderate_balanced	5	0.1	0.2	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.996218	True	136.8	3.6346	0.2	True	2.2417	False	True	0.1996	False
+chen_moderate_balanced_t006	chen_moderate_balanced	6	0.1	0.2	0.5	0.1	0.2	0.1	Type B	{'Type B': 5}	1.027344	True	399.8	8.6776	0.3	True	5.0167	False	True	0.2973	False
+chen_moderate_balanced_t007	chen_moderate_balanced	7	0.1	0.2	0.5	0.1	0.2	0.1	Type B	{'Type B': 5}	0.962194	True	212.2	3.1331	0.15	True	1.4751	False	True	0.1493	False
+chen_moderate_balanced_t008	chen_moderate_balanced	8	0.1	0.2	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.961926	True	85.0	3.7195	0.1	True	1.8899	False	False	0.0996	False
+chen_moderate_balanced_t009	chen_moderate_balanced	9	0.1	0.2	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	1.029401	True	120.8	5.0336	0.2	True	2.1313	False	True	0.1991	False
+chen_stress_balanced_t000	chen_stress_balanced	0	0.2	0.4	0.5	0.1	0.2	0.1	Type E	{'Type E': 5}	1.164791	False		1.4600106130395391e+78	0.4	False	1.0493928178640513e+78	False	True	0.3978	False
+chen_stress_balanced_t001	chen_stress_balanced	1	0.2	0.4	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	0.8	True	83.2	13.9176	0.35	True	8.1582	False	True	0.3498	False
+chen_stress_balanced_t002	chen_stress_balanced	2	0.2	0.4	0.5	0.1	0.2	0.1	Type E	{'Type E': 5}	1.198401	False		2.1302249441073378e+32	0.3	False	1.3836039715861509e+32	False	True	0.2982	False
+chen_stress_balanced_t003	chen_stress_balanced	3	0.2	0.4	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	1.123967	True	72.6	9.4575	0.3	True	6.5439	False	True	0.2995	False
+chen_stress_balanced_t004	chen_stress_balanced	4	0.2	0.4	0.5	0.1	0.2	0.1	Type E	{'Type E': 5}	1.140272	False		4.530897433478782e+44	0.35	False	3.4466342954315026e+44	False	True	0.349	False
+chen_stress_balanced_t005	chen_stress_balanced	5	0.2	0.4	0.5	0.1	0.2	0.1	Type A	{'Type A': 5}	1.201304	True	81.2	12.0376	0.3	True	12.4012	False	True	0.299	False
+chen_stress_balanced_t006	chen_stress_balanced	6	0.2	0.4	0.5	0.1	0.2	0.1	Type E	{'Type E': 5}	1.149618	False		951015625726332.4	0.3	False	825074992545787.1	False	True	0.2982	False
+chen_stress_balanced_t007	chen_stress_balanced	7	0.2	0.4	0.5	0.1	0.2	0.1	Type E	{'Type E': 5}	1.121079	False		28740805691432.812	0.3	False	19200619940291.39	False	True	0.2989	False
+chen_stress_balanced_t008	chen_stress_balanced	8	0.2	0.4	0.5	0.1	0.2	0.1	Type C	{'Type C': 5}	1.030095	True	565.2	9.2806	0.3	True	6.0224	False	True	0.2971	True
+chen_stress_balanced_t009	chen_stress_balanced	9	0.2	0.4	0.5	0.1	0.2	0.1	Type E	{'Type E': 5}	1.216043	False		1.2275694469792108e+38	0.3	False	8.46602501688214e+37	False	True	0.2975	False
+baseline_repression_biased_t000	baseline_repression_biased	0	0.02	0.1	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.871411	True	53.2	2.0358	0.0	True	0.9967	False	False	0.0001	False
+baseline_repression_biased_t001	baseline_repression_biased	1	0.02	0.1	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.852799	True	49.4	1.999	0.0	True	0.9971	False	False	0.0	False
+baseline_repression_biased_t002	baseline_repression_biased	2	0.02	0.1	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.868894	True	49.8	1.9969	0.0	True	0.9973	False	False	0.0	False
+baseline_repression_biased_t003	baseline_repression_biased	3	0.02	0.1	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.867803	True	49.2	2.2097	0.0	True	0.9994	False	False	0.0	False
+baseline_repression_biased_t004	baseline_repression_biased	4	0.02	0.1	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.879038	True	50.0	2.1906	0.0	True	0.9945	False	False	0.0	False
+baseline_repression_biased_t005	baseline_repression_biased	5	0.02	0.1	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.87811	True	46.6	2.1065	0.1	True	0.9997	False	False	0.0992	False
+baseline_repression_biased_t006	baseline_repression_biased	6	0.02	0.1	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.894771	True	55.2	1.9644	0.0	True	0.9967	False	False	0.0	False
+baseline_repression_biased_t007	baseline_repression_biased	7	0.02	0.1	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.879219	True	58.0	2.1353	0.05	True	0.9927	False	False	0.0495	False
+baseline_repression_biased_t008	baseline_repression_biased	8	0.02	0.1	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.8701	True	48.6	2.2038	0.0	True	1.1034	False	False	0.0001	False
+baseline_repression_biased_t009	baseline_repression_biased	9	0.02	0.1	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.905499	True	52.6	1.9883	0.0	True	0.9897	False	False	0.0002	False
+stress_repression_biased_t000	stress_repression_biased	0	0.1	0.3	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.955806	True	101.8	2.2397	0.2	True	1.3677	False	True	0.1995	False
+stress_repression_biased_t001	stress_repression_biased	1	0.1	0.3	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.974801	True	134.8	2.4161	0.25	True	1.5206	False	True	0.249	False
+stress_repression_biased_t002	stress_repression_biased	2	0.1	0.3	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.968363	True	72.4	2.3579	0.3	True	1.342	False	True	0.2983	False
+stress_repression_biased_t003	stress_repression_biased	3	0.1	0.3	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.067061	True	59.6	4.3065	0.5	True	3.7772	False	True	0.4976	False
+stress_repression_biased_t004	stress_repression_biased	4	0.1	0.3	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.091605	True	69.0	8.1023	0.4	True	5.2009	False	True	0.3996	False
+stress_repression_biased_t005	stress_repression_biased	5	0.1	0.3	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.102305	True	63.4	2.9392	0.35	True	2.2739	False	True	0.3471	False
+stress_repression_biased_t006	stress_repression_biased	6	0.1	0.3	0.333	0.1	0.2	0.1	Type B	{'Type A': 2, 'Type B': 3}	1.066253	True	196.0	2.5863	0.3	True	1.5415	False	True	0.2991	False
+stress_repression_biased_t007	stress_repression_biased	7	0.1	0.3	0.333	0.1	0.2	0.1	Type E	{'Type E': 5}	0.995434	False		2734657257.1216	0.3	False	2445366053.0218	False	True	0.3034	False
+stress_repression_biased_t008	stress_repression_biased	8	0.1	0.3	0.333	0.1	0.2	0.1	Type E	{'Type E': 5}	1.001653	False		587944779068.1941	0.45	False	376366953610.0887	False	True	0.4463	False
+stress_repression_biased_t009	stress_repression_biased	9	0.1	0.3	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.129333	True	56.6	1.9913	0.29	True	1.5471	False	True	0.2887	False
+chen_moderate_repression_biased_t000	chen_moderate_repression_biased	0	0.1	0.2	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.925827	True	78.0	2.0892	0.2	True	1.0094	False	True	0.1991	False
+chen_moderate_repression_biased_t001	chen_moderate_repression_biased	1	0.1	0.2	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.93057	True	65.4	2.3859	0.3	True	1.0911	False	True	0.2984	False
+chen_moderate_repression_biased_t002	chen_moderate_repression_biased	2	0.1	0.2	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.960934	True	71.6	2.4065	0.25	True	1.4425	False	True	0.2489	False
+chen_moderate_repression_biased_t003	chen_moderate_repression_biased	3	0.1	0.2	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.992989	True	62.0	2.9038	0.35	True	2.1994	False	True	0.348	False
+chen_moderate_repression_biased_t004	chen_moderate_repression_biased	4	0.1	0.2	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.009366	True	72.8	3.0396	0.4	True	1.5429	False	True	0.3978	False
+chen_moderate_repression_biased_t005	chen_moderate_repression_biased	5	0.1	0.2	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.998783	True	60.8	3.2516	0.25	True	2.2171	False	True	0.2496	False
+chen_moderate_repression_biased_t006	chen_moderate_repression_biased	6	0.1	0.2	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.910132	True	67.6	2.4521	0.35	True	1.2487	False	True	0.3485	False
+chen_moderate_repression_biased_t007	chen_moderate_repression_biased	7	0.1	0.2	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.019889	True	51.8	2.7206	0.4	True	1.6445	False	True	0.3975	False
+chen_moderate_repression_biased_t008	chen_moderate_repression_biased	8	0.1	0.2	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	0.93066	True	86.4	2.2243	0.25	True	1.4969	False	True	0.2492	False
+chen_moderate_repression_biased_t009	chen_moderate_repression_biased	9	0.1	0.2	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.007097	True	83.0	1.8933	0.25	True	1.0996	False	True	0.2474	False
+chen_stress_repression_biased_t000	chen_stress_repression_biased	0	0.2	0.4	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.10137	True	62.0	2.614	0.45	True	1.9134	False	True	0.4488	False
+chen_stress_repression_biased_t001	chen_stress_repression_biased	1	0.2	0.4	0.333	0.1	0.2	0.1	Type C	{'Type C': 5}	1.08271	True	924.0	3.052	0.35	True	1.9629	False	True	0.3495	True
+chen_stress_repression_biased_t002	chen_stress_repression_biased	2	0.2	0.4	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.114918	True	52.8	3.3719	0.4	True	2.2788	False	True	0.3987	False
+chen_stress_repression_biased_t003	chen_stress_repression_biased	3	0.2	0.4	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.163659	True	67.8	4.7349	0.5	True	4.3181	False	True	0.4994	False
+chen_stress_repression_biased_t004	chen_stress_repression_biased	4	0.2	0.4	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.171222	True	85.6	16.6551	0.45	True	10.6818	False	True	0.4492	False
+chen_stress_repression_biased_t005	chen_stress_repression_biased	5	0.2	0.4	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.163783	True	59.2	4.9269	0.5	True	4.1373	False	True	0.498	False
+chen_stress_repression_biased_t006	chen_stress_repression_biased	6	0.2	0.4	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.150398	True	70.6	4.4004	0.35	True	2.5421	False	True	0.3502	False
+chen_stress_repression_biased_t007	chen_stress_repression_biased	7	0.2	0.4	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.177114	True	52.2	3.7494	0.45	True	2.6878	False	True	0.4488	False
+chen_stress_repression_biased_t008	chen_stress_repression_biased	8	0.2	0.4	0.333	0.1	0.2	0.1	Type E	{'Type E': 5}	1.091296	False		3.0650279119078566e+57	0.5	False	3.057664770380682e+57	False	True	0.4984	False
+chen_stress_repression_biased_t009	chen_stress_repression_biased	9	0.2	0.4	0.333	0.1	0.2	0.1	Type A	{'Type A': 5}	1.159478	True	55.0	2.4589	0.35	True	1.6011	False	True	0.3494	False

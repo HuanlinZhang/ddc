@@ -1,0 +1,9 @@
+combo_key	n_worlds	a_min	a_max	decay_delta	convergence_rate	bounded_rate	collapse_rate	mean_spectral_radius	Type A	Type B	Type C	Type D	Type E	Type F	Type G
+baseline_balanced	10	0.02	0.1	0.2	1.0	1.0	0.0	0.870838	100.0	0	0	0	0	0	0
+baseline_repression_biased	10	0.02	0.1	0.2	1.0	1.0	0.0	0.876765	100.0	0	0	0	0	0	0
+chen_moderate_balanced	10	0.1	0.2	0.2	1.0	1.0	0.0	0.971948	60.0	40.0	0	0	0	0	0
+chen_moderate_repression_biased	10	0.1	0.2	0.2	1.0	1.0	0.0	0.968625	100.0	0	0	0	0	0	0
+chen_stress_balanced	10	0.2	0.4	0.2	0.4	0.4	0.0	1.114557	30.0	0	10.0	0	60.0	0	0
+chen_stress_repression_biased	10	0.2	0.4	0.2	0.9	0.9	0.0	1.137595	80.0	0	10.0	0	10.0	0	0
+stress_balanced	10	0.1	0.3	0.2	0.7	0.8	0.0	1.025092	30.0	40.0	0	10.0	20.0	0	0
+stress_repression_biased	10	0.1	0.3	0.2	0.8	0.8	0.0	1.035261	70.0	10.0	0	0	20.0	0	0

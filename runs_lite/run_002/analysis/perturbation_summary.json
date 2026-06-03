@@ -1,0 +1,236 @@
+[
+  {
+    "world_id": "stress_balanced_t005",
+    "cell": "cell00",
+    "original_attractor": "Type D",
+    "perturbed_attractor": "Type D",
+    "attractor_changed": false,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        15
+      ]
+    },
+    "knockdown_gene": 15,
+    "knockdown_gene_expr_at_intervention": 4.38697511074545,
+    "intervention_time": 500,
+    "recovery_time": null,
+    "recovery_failure": true,
+    "equilibrium_converged": false,
+    "equilibrium_time": -1,
+    "oscillation_type": "sustained",
+    "divergent": false,
+    "collapsed": false,
+    "max_expression": 4.395683889071741,
+    "final_mean_expression": 0.7860959981135625
+  },
+  {
+    "world_id": "chen_stress_balanced_t008",
+    "cell": "cell00",
+    "original_attractor": "Type C",
+    "perturbed_attractor": "Type C",
+    "attractor_changed": false,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        4
+      ]
+    },
+    "knockdown_gene": 4,
+    "knockdown_gene_expr_at_intervention": 5.423148383298499,
+    "intervention_time": 500,
+    "recovery_time": null,
+    "recovery_failure": true,
+    "equilibrium_converged": false,
+    "equilibrium_time": -1,
+    "oscillation_type": "damped",
+    "divergent": false,
+    "collapsed": false,
+    "max_expression": 5.629494185485147,
+    "final_mean_expression": 1.364613623561592
+  },
+  {
+    "world_id": "chen_stress_repression_biased_t001",
+    "cell": "cell00",
+    "original_attractor": "Type C",
+    "perturbed_attractor": "Type C",
+    "attractor_changed": false,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        15
+      ]
+    },
+    "knockdown_gene": 15,
+    "knockdown_gene_expr_at_intervention": 1.5271013973513106,
+    "intervention_time": 500,
+    "recovery_time": null,
+    "recovery_failure": true,
+    "equilibrium_converged": false,
+    "equilibrium_time": -1,
+    "oscillation_type": "damped",
+    "divergent": false,
+    "collapsed": false,
+    "max_expression": 1.6002609999182815,
+    "final_mean_expression": 0.469701926413431
+  },
+  {
+    "world_id": "stress_repression_biased_t006",
+    "cell": "cell01",
+    "original_attractor": "Type B",
+    "perturbed_attractor": "Type A",
+    "attractor_changed": true,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        10
+      ]
+    },
+    "knockdown_gene": 10,
+    "knockdown_gene_expr_at_intervention": 1.1991836534358453,
+    "intervention_time": 500,
+    "recovery_time": 558,
+    "recovery_failure": false,
+    "equilibrium_converged": true,
+    "equilibrium_time": 58,
+    "oscillation_type": "none",
+    "divergent": false,
+    "collapsed": false,
+    "max_expression": 1.1991835873658272,
+    "final_mean_expression": 0.42600140765395655
+  },
+  {
+    "world_id": "chen_moderate_balanced_t007",
+    "cell": "cell00",
+    "original_attractor": "Type B",
+    "perturbed_attractor": "Type A",
+    "attractor_changed": true,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        6
+      ]
+    },
+    "knockdown_gene": 6,
+    "knockdown_gene_expr_at_intervention": 1.2831974791552412,
+    "intervention_time": 500,
+    "recovery_time": 537,
+    "recovery_failure": false,
+    "equilibrium_converged": true,
+    "equilibrium_time": 37,
+    "oscillation_type": "none",
+    "divergent": false,
+    "collapsed": false,
+    "max_expression": 1.2831976825765639,
+    "final_mean_expression": 0.5744337984110099
+  },
+  {
+    "world_id": "stress_repression_biased_t007",
+    "cell": "cell00",
+    "original_attractor": "Type E",
+    "perturbed_attractor": "Type E",
+    "attractor_changed": false,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        10
+      ]
+    },
+    "knockdown_gene": 10,
+    "knockdown_gene_expr_at_intervention": 4669.303934569105,
+    "intervention_time": 500,
+    "recovery_time": null,
+    "recovery_failure": true,
+    "equilibrium_converged": false,
+    "equilibrium_time": -1,
+    "oscillation_type": "none",
+    "divergent": true,
+    "collapsed": false,
+    "max_expression": 63288888.82020182,
+    "final_mean_expression": 11725980.031387985
+  },
+  {
+    "world_id": "stress_balanced_t000",
+    "cell": "cell00",
+    "original_attractor": "Type E",
+    "perturbed_attractor": "Type E",
+    "attractor_changed": false,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        15
+      ]
+    },
+    "knockdown_gene": 15,
+    "knockdown_gene_expr_at_intervention": 6548740756084.996,
+    "intervention_time": 500,
+    "recovery_time": null,
+    "recovery_failure": true,
+    "equilibrium_converged": false,
+    "equilibrium_time": -1,
+    "oscillation_type": "none",
+    "divergent": true,
+    "collapsed": false,
+    "max_expression": 1.6529001351834483e+25,
+    "final_mean_expression": 3.401032860830376e+24
+  },
+  {
+    "world_id": "chen_stress_balanced_t005",
+    "cell": "cell00",
+    "original_attractor": "Type A",
+    "perturbed_attractor": "Type A",
+    "attractor_changed": false,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        15
+      ]
+    },
+    "knockdown_gene": 15,
+    "knockdown_gene_expr_at_intervention": 10.405436587941596,
+    "intervention_time": 500,
+    "recovery_time": 546,
+    "recovery_failure": false,
+    "equilibrium_converged": true,
+    "equilibrium_time": 46,
+    "oscillation_type": "none",
+    "divergent": false,
+    "collapsed": false,
+    "max_expression": 10.405436587941582,
+    "final_mean_expression": 1.3356508408719767
+  },
+  {
+    "world_id": "chen_stress_repression_biased_t007",
+    "cell": "cell00",
+    "original_attractor": "Type A",
+    "perturbed_attractor": "Type A",
+    "attractor_changed": false,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        3
+      ]
+    },
+    "knockdown_gene": 3,
+    "knockdown_gene_expr_at_intervention": 2.6877686196043666,
+    "intervention_time": 500,
+    "recovery_time": 545,
+    "recovery_failure": false,
+    "equilibrium_converged": true,
+    "equilibrium_time": 45,
+    "oscillation_type": "none",
+    "divergent": false,
+    "collapsed": false,
+    "max_expression": 2.6877686196043666,
+    "final_mean_expression": 0.5035307753876535
+  }
+]

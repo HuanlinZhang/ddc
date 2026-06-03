@@ -1,0 +1,126 @@
+{
+  "baseline_balanced": {
+    "n_worlds": 10,
+    "attractor_distribution": {
+      "Type A": 10
+    },
+    "attractor_distribution_pct": {
+      "Type A": 100.0
+    },
+    "mean_spectral_radius": 0.8708377074747826,
+    "convergence_rate": 1.0,
+    "bounded_rate": 1.0,
+    "collapse_rate": 0.0
+  },
+  "stress_balanced": {
+    "n_worlds": 10,
+    "attractor_distribution": {
+      "Type E": 2,
+      "Type A": 3,
+      "Type B": 4,
+      "Type D": 1
+    },
+    "attractor_distribution_pct": {
+      "Type E": 20.0,
+      "Type A": 30.0,
+      "Type B": 40.0,
+      "Type D": 10.0
+    },
+    "mean_spectral_radius": 1.0250917692055448,
+    "convergence_rate": 0.7,
+    "bounded_rate": 0.8,
+    "collapse_rate": 0.0
+  },
+  "chen_moderate_balanced": {
+    "n_worlds": 10,
+    "attractor_distribution": {
+      "Type B": 4,
+      "Type A": 6
+    },
+    "attractor_distribution_pct": {
+      "Type B": 40.0,
+      "Type A": 60.0
+    },
+    "mean_spectral_radius": 0.9719484984839596,
+    "convergence_rate": 1.0,
+    "bounded_rate": 1.0,
+    "collapse_rate": 0.0
+  },
+  "chen_stress_balanced": {
+    "n_worlds": 10,
+    "attractor_distribution": {
+      "Type E": 6,
+      "Type A": 3,
+      "Type C": 1
+    },
+    "attractor_distribution_pct": {
+      "Type E": 60.0,
+      "Type A": 30.0,
+      "Type C": 10.0
+    },
+    "mean_spectral_radius": 1.1145570678786074,
+    "convergence_rate": 0.4,
+    "bounded_rate": 0.4,
+    "collapse_rate": 0.0
+  },
+  "baseline_repression_biased": {
+    "n_worlds": 10,
+    "attractor_distribution": {
+      "Type A": 10
+    },
+    "attractor_distribution_pct": {
+      "Type A": 100.0
+    },
+    "mean_spectral_radius": 0.8767645146150034,
+    "convergence_rate": 1.0,
+    "bounded_rate": 1.0,
+    "collapse_rate": 0.0
+  },
+  "stress_repression_biased": {
+    "n_worlds": 10,
+    "attractor_distribution": {
+      "Type A": 7,
+      "Type B": 1,
+      "Type E": 2
+    },
+    "attractor_distribution_pct": {
+      "Type A": 70.0,
+      "Type B": 10.0,
+      "Type E": 20.0
+    },
+    "mean_spectral_radius": 1.0352613973113087,
+    "convergence_rate": 0.8,
+    "bounded_rate": 0.8,
+    "collapse_rate": 0.0
+  },
+  "chen_moderate_repression_biased": {
+    "n_worlds": 10,
+    "attractor_distribution": {
+      "Type A": 10
+    },
+    "attractor_distribution_pct": {
+      "Type A": 100.0
+    },
+    "mean_spectral_radius": 0.9686246388349765,
+    "convergence_rate": 1.0,
+    "bounded_rate": 1.0,
+    "collapse_rate": 0.0
+  },
+  "chen_stress_repression_biased": {
+    "n_worlds": 10,
+    "attractor_distribution": {
+      "Type A": 8,
+      "Type C": 1,
+      "Type E": 1
+    },
+    "attractor_distribution_pct": {
+      "Type A": 80.0,
+      "Type C": 10.0,
+      "Type E": 10.0
+    },
+    "mean_spectral_radius": 1.1375948902058206,
+    "convergence_rate": 0.9,
+    "bounded_rate": 0.9,
+    "collapse_rate": 0.0
+  }
+}

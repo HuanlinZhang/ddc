@@ -1,0 +1,329 @@
+{
+  "n_topos": 20,
+  "n_topo_diverse": 12,
+  "topo_diverse_frac": 0.6,
+  "n_transitions": 49,
+  "n_same_attractor": 71,
+  "topo_summaries": {
+    "balanced_t000": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type E",
+        "chen_moderate": "Type B",
+        "chen_stress": "Type E"
+      },
+      "n_distinct_attractors": 3
+    },
+    "balanced_t001": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type A",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 1
+    },
+    "balanced_t002": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type B",
+        "chen_moderate": "Type B",
+        "chen_stress": "Type E"
+      },
+      "n_distinct_attractors": 3
+    },
+    "balanced_t003": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type A",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 1
+    },
+    "balanced_t004": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type B",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type E"
+      },
+      "n_distinct_attractors": 3
+    },
+    "balanced_t005": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type D",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 2
+    },
+    "balanced_t006": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type B",
+        "chen_moderate": "Type B",
+        "chen_stress": "Type E"
+      },
+      "n_distinct_attractors": 3
+    },
+    "balanced_t007": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type E",
+        "chen_moderate": "Type B",
+        "chen_stress": "Type E"
+      },
+      "n_distinct_attractors": 3
+    },
+    "balanced_t008": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type A",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type C"
+      },
+      "n_distinct_attractors": 2
+    },
+    "balanced_t009": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type B",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type E"
+      },
+      "n_distinct_attractors": 3
+    },
+    "repression_biased_t000": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type A",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 1
+    },
+    "repression_biased_t001": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type A",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type C"
+      },
+      "n_distinct_attractors": 2
+    },
+    "repression_biased_t002": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type A",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 1
+    },
+    "repression_biased_t003": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type A",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 1
+    },
+    "repression_biased_t004": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type A",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 1
+    },
+    "repression_biased_t005": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type A",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 1
+    },
+    "repression_biased_t006": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type B",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 2
+    },
+    "repression_biased_t007": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type E",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 2
+    },
+    "repression_biased_t008": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type E",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type E"
+      },
+      "n_distinct_attractors": 2
+    },
+    "repression_biased_t009": {
+      "n_worlds": 4,
+      "strength_regimes": [
+        "baseline",
+        "chen_moderate",
+        "chen_stress",
+        "stress"
+      ],
+      "attractor_by_regime": {
+        "baseline": "Type A",
+        "stress": "Type A",
+        "chen_moderate": "Type A",
+        "chen_stress": "Type A"
+      },
+      "n_distinct_attractors": 1
+    }
+  }
+}
