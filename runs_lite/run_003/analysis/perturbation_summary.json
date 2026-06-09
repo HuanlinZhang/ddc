@@ -1,0 +1,83 @@
+[
+  {
+    "world_id": "baseline_balanced_t000",
+    "cell": "cell00",
+    "original_attractor": "Type A",
+    "perturbed_attractor": "Type A",
+    "attractor_changed": false,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        14
+      ]
+    },
+    "knockdown_gene": 14,
+    "knockdown_gene_role": "non-TF",
+    "knockdown_gene_expr_at_intervention": 1.2754197009604415,
+    "intervention_time": 500,
+    "recovery_time": 37,
+    "recovery_failure": false,
+    "equilibrium_converged": true,
+    "equilibrium_time": 37,
+    "oscillation_type": "none",
+    "divergent": false,
+    "collapsed": false,
+    "max_expression": 1.2754197009604415,
+    "final_mean_expression": 0.5523592091162348
+  },
+  {
+    "world_id": "chen_moderate_balanced_t003",
+    "cell": "cell00",
+    "original_attractor": "Type B",
+    "perturbed_attractor": "Type A",
+    "attractor_changed": true,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        17
+      ]
+    },
+    "knockdown_gene": 17,
+    "knockdown_gene_role": "non-TF",
+    "knockdown_gene_expr_at_intervention": 11.918739147603974,
+    "intervention_time": 500,
+    "recovery_time": 51,
+    "recovery_failure": false,
+    "equilibrium_converged": true,
+    "equilibrium_time": 51,
+    "oscillation_type": "none",
+    "divergent": false,
+    "collapsed": false,
+    "max_expression": 11.92421943061601,
+    "final_mean_expression": 3.637052548216001
+  },
+  {
+    "world_id": "stress_balanced_t003",
+    "cell": "cell00",
+    "original_attractor": "Type E",
+    "perturbed_attractor": "Type E",
+    "attractor_changed": false,
+    "perturbation_history": {
+      "time": 500,
+      "type": "knockdown",
+      "knockdown_genes": [
+        17
+      ]
+    },
+    "knockdown_gene": 17,
+    "knockdown_gene_role": "non-TF",
+    "knockdown_gene_expr_at_intervention": 3704086144770015.5,
+    "intervention_time": 500,
+    "recovery_time": null,
+    "recovery_failure": true,
+    "equilibrium_converged": false,
+    "equilibrium_time": -1,
+    "oscillation_type": "none",
+    "divergent": true,
+    "collapsed": false,
+    "max_expression": 4.270015478564462e+30,
+    "final_mean_expression": 1.1006902847963239e+30
+  }
+]

@@ -1,0 +1,9 @@
+strength_regime	sign_ratio_regime	n_worlds	a_min	a_max	act_rep	decay_delta	convergence_rate	bounded_rate	collapse_rate	mean_spectral_radius	Type A	Type B	Type C	Type D	Type E	Type F	Type G
+baseline	balanced	10	0.02	0.1	1:1	0.2	1.0	1.0	0.0	0.848262	100.0	0	0	0	0	0	0
+baseline	repression_biased	10	0.02	0.1	1:2	0.2	1.0	1.0	0.0	0.847576	100.0	0	0	0	0	0	0
+chen_moderate	balanced	10	0.1	0.2	1:1	0.2	1.0	1.0	0.0	0.91108	90.0	10.0	0	0	0	0	0
+chen_moderate	repression_biased	10	0.1	0.2	1:2	0.2	1.0	1.0	0.0	0.918469	100.0	0	0	0	0	0	0
+chen_stress	balanced	10	0.2	0.4	1:1	0.2	0.8	0.8	0.0	1.038129	80.0	0	0	0	20.0	0	0
+chen_stress	repression_biased	10	0.2	0.4	1:2	0.2	0.9	1.0	0.0	1.076307	90.0	10.0	0	0	0	0	0
+stress	balanced	10	0.1	0.3	1:1	0.2	0.9	0.9	0.0	0.946243	90.0	0	0	0	10.0	0	0
+stress	repression_biased	10	0.1	0.3	1:2	0.2	1.0	1.0	0.0	0.98514	90.0	10.0	0	0	0	0	0
