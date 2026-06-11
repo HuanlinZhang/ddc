@@ -261,6 +261,11 @@ def simulate_single_cell(
                 'scale_genes': intervention_config.get('scale'),
                 'set_genes': intervention_config.get('set'),
             }
+            raw = A @ X + b
+            X_next = torch.clamp(raw, min=0.0)
+            X = X_next
+            X_traj[t + 1] = X
+            clip_count[t + 1] = (raw != X).sum().item()
             continue
 
         raw = A @ X + b
