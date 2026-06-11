@@ -611,7 +611,7 @@ def plot_canonical_trajectories(all_results: List[Dict[str, Any]]):
         if traj_files:
             data = torch.load(os.path.join(TRAJECTORIES_DIR, traj_files[0]), weights_only=False)
             X = data['X_traj'].numpy()
-            for g in range(min(dma.G, 10)):
+            for g in range(dma.G):
                 ax.plot(X[:, g], alpha=0.9, linewidth=0.8)
             at_name = ATTRACTOR_NAMES.get(atype, atype)
             ax.set_title(f'{atype} — {at_name} — {wid}')
@@ -658,7 +658,7 @@ def plot_all_worlds_trajectories():
                     X = data['X_traj'].numpy()
                     at = data['attractor_type']
                     at_name = ATTRACTOR_NAMES.get(at, at)
-                    for g in range(min(dma.G, 10)):
+                    for g in range(dma.G):
                         ax.plot(X[:, g], alpha=0.95, linewidth=1.5)
                     ax.set_title(f'[{at}: {at_name}]', fontsize=10)
                     ax.tick_params(labelsize=7)
@@ -1109,7 +1109,7 @@ def plot_clipping_dominated_by_regime(all_results: List[Dict[str, Any]]):
     plt.close(fig)
 
 
-def plot_degree_distribution_vs_stability(all_results: List[Dict[str, Any]]):
+def plot_in_degree_distribution_vs_stability(all_results: List[Dict[str, Any]]):
     attractor_labels = [
         ('Type A', 'Stable'),
         ('Type B', 'Slow'),
@@ -1183,11 +1183,371 @@ def plot_degree_distribution_vs_stability(all_results: List[Dict[str, Any]]):
     ax.set_ylabel('world count (integer)')
     ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
     ax.set_ylim(top=max(max(c.values()) for c in counts.values()) * 1.15 + 1)
-    ax.set_title(f'Topology Realization / Degree Std vs Stability\n(std = std of per-gene in-degree; higher std = more hub-like topology)')
+    ax.set_title(f'Topology Realization / In-Degree Std vs Stability\n(std = std of per-gene in-degree)')
     ax.legend(fontsize=8)
     plt.tight_layout()
-    fig.savefig(os.path.join(FIGURES_DIR, 'degree_distribution_vs_stability.png'), dpi=150)
+    fig.savefig(os.path.join(FIGURES_DIR, 'in_degree_distribution_vs_stability.png'), dpi=150)
     plt.close(fig)
+
+
+def plot_out_degree_distribution_vs_stability(all_results: List[Dict[str, Any]]):
+    """Plot out-degree distribution std vs stability, same format as in-degree version."""
+    attractor_labels = [
+        ('Type A', 'Stable'),
+        ('Type B', 'Slow'),
+        ('Type C', 'Damped'),
+        ('Type D', 'Sustained'),
+        ('Type E', 'Divergence'),
+        ('Type F', 'Collapse'),
+        ('Type G', 'Others'),
+    ]
+
+    world_data = []
+    for r in all_results:
+        meta_path = os.path.join(METADATA_DIR, f'{r["world_id"]}.json')
+        if not os.path.exists(meta_path):
+            continue
+        with open(meta_path) as f:
+            meta = json.load(f)
+        out_deg = meta.get('out_degrees', {})
+        if not out_deg:
+            continue
+        values = np.array([int(v) for v in out_deg.values()], dtype=float)
+        std = float(np.std(values, ddof=0))
+        world_data.append((std, r['primary_attractor']))
+
+    if not world_data:
+        return
+
+    stds = np.array([w[0] for w in world_data])
+    q25, q50, q75 = np.percentile(stds, [25, 50, 75])
+    bucket_edges = [0.0, q25, q50, q75, np.inf]
+
+    def assign_bucket(v):
+        if v < q25:    return 'Q1 (low)'
+        if v < q50:    return 'Q2'
+        if v < q75:    return 'Q3'
+        return 'Q4 (high)'
+
+    degree_buckets = ['Q1 (low)', 'Q2', 'Q3', 'Q4 (high)']
+    counts = {at: {b: 0 for b in degree_buckets} for at, _ in attractor_labels}
+    for std, at in world_data:
+        b = assign_bucket(std)
+        for a, _ in attractor_labels:
+            if at == a:
+                counts[a][b] += 1
+                break
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    n_at = len(attractor_labels)
+    width = 0.18
+    x = np.arange(len(degree_buckets)) * 1.4
+    colors_list = ['#2ecc71', '#3498db', '#f39c12', '#e74c3c', '#9b59b6', '#34495e', '#95a5a6']
+
+    for ai, (at, name) in enumerate(attractor_labels):
+        vals = [counts[at][b] for b in degree_buckets]
+        positions_x = x + (ai - (n_at - 1) / 2) * width
+        bars = ax.bar(positions_x, vals, width,
+                color=colors_list[ai], label=f'{at} - {name}')
+        for rect, v in zip(bars, vals):
+            if v > 0:
+                ax.text(rect.get_x() + rect.get_width() / 2, v + 0.3, str(int(v)),
+                        ha='center', va='bottom', fontsize=10, color='black')
+
+    ax.set_xticks(x)
+    labels_xticks = [
+        f"{b}\nstd range\n[{bucket_edges[i]:.2f}, {bucket_edges[i+1]:.2f})" if i < 3
+        else f"{b}\nstd ≥ {bucket_edges[i]:.2f}"
+        for i, b in enumerate(degree_buckets)
+    ]
+    ax.set_xticklabels(labels_xticks)
+    ax.set_xlabel('std of out-degree distribution (quartile bins)')
+    ax.set_ylabel('world count (integer)')
+    ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+    ax.set_ylim(top=max(max(c.values()) for c in counts.values()) * 1.15 + 1)
+    ax.set_title(f'Topology Realization / Out-Degree Std vs Stability\n(std = std of per-gene out-degree; higher std = more hub-like regulatory topology)')
+    ax.legend(fontsize=8)
+    plt.tight_layout()
+    fig.savefig(os.path.join(FIGURES_DIR, 'out_degree_distribution_vs_stability.png'), dpi=150)
+    plt.close(fig)
+
+
+def plot_topology_exemplars_in_degree(all_results: List[Dict[str, Any]]):
+    """Draw directed graph structure for 2 worlds per in-degree std quartile (Q1-Q4)."""
+    try:
+        import networkx as nx
+    except ImportError:
+        print('  skip topology exemplars: networkx not installed')
+        return
+
+    world_data = []
+    for r in all_results:
+        meta_path = os.path.join(METADATA_DIR, f'{r["world_id"]}.json')
+        if not os.path.exists(meta_path):
+            continue
+        with open(meta_path) as f:
+            meta = json.load(f)
+        in_deg = meta.get('in_degrees', {})
+        if not in_deg:
+            continue
+        values = np.array([int(v) for v in in_deg.values()], dtype=float)
+        std = float(np.std(values, ddof=0))
+        world_data.append((r['world_id'], std, meta, r.get('primary_attractor', '?')))
+
+    if not world_data:
+        return
+
+    stds = np.array([w[1] for w in world_data])
+    q25, q50, q75 = np.percentile(stds, [25, 50, 75])
+
+    def bucket(s):
+        if s < q25:    return 'Q1 (low)'
+        if s < q50:    return 'Q2'
+        if s < q75:    return 'Q3'
+        return 'Q4 (high)'
+
+    quartiles = ['Q1 (low)', 'Q2', 'Q3', 'Q4 (high)']
+    bucket_edges = [0.0, q25, q50, q75, np.inf]
+
+    # For each quartile, pick 2 worlds:
+    #   1st: a Type A (representative stable attractor)
+    #   2nd: prefer C/D/E (oscillation/divergence), then fall back to any non-A
+    # Dedup by topo_idx: each combo (regime, sign_ratio) re-uses the same topology
+    # realization, so the underlying graph structure is identical across regimes.
+    # Two passes: first try C/D/E for slot 1, then fall back to any non-A.
+    selected = {q: [] for q in quartiles}
+    for wid, std, meta, atype in world_data:
+        b = bucket(std)
+        topo_idx = meta.get('topo_idx')
+        seen_topo = {m.get('topo_idx') for _, m, _ in selected[b]}
+        if topo_idx in seen_topo:
+            continue
+        if len(selected[b]) == 0 and atype != 'Type A':
+            continue
+        if len(selected[b]) >= 2:
+            continue
+        if len(selected[b]) == 1 and atype == 'Type A':
+            continue
+        # Pass 1 (preferred): slot 1 must be C/D/E
+        if len(selected[b]) == 1 and atype not in ('Type C', 'Type D', 'Type E'):
+            continue
+        selected[b].append((wid, meta, atype))
+        if all(len(selected[q]) >= 2 for q in quartiles):
+            break
+    # Pass 2: relax to any non-A for any quartile still missing slot 1
+    if not all(len(selected[q]) >= 2 for q in quartiles):
+        for wid, std, meta, atype in world_data:
+            b = bucket(std)
+            topo_idx = meta.get('topo_idx')
+            seen_topo = {m.get('topo_idx') for _, m, _ in selected[b]}
+            if topo_idx in seen_topo:
+                continue
+            if len(selected[b]) >= 2:
+                continue
+            if len(selected[b]) == 1 and atype == 'Type A':
+                continue
+            selected[b].append((wid, meta, atype))
+            if all(len(selected[q]) >= 2 for q in quartiles):
+                break
+
+    fig, axes = plt.subplots(4, 2, figsize=(10, 16))
+    for row, q in enumerate(quartiles):
+        edges = bucket_edges[row:row + 2]
+        if row < 3:
+            range_label = f'std ∈ [{edges[0]:.2f}, {edges[1]:.2f})'
+        else:
+            range_label = f'std ≥ {edges[0]:.2f}'
+        for col in range(2):
+            ax = axes[row, col]
+            if col >= len(selected[q]):
+                ax.axis('off')
+                continue
+            wid, meta, atype = selected[q][col]
+            in_deg_meta = meta.get('in_degrees', {})
+            std_local = float(np.std([int(v) for v in in_deg_meta.values()], ddof=0))
+            G = nx.DiGraph()
+            G.add_nodes_from(range(dma.G))
+            P_graph = meta.get('P_graph', {})
+            edge_signs = meta.get('edge_signs', {})
+            for reg_str, targets in P_graph.items():
+                reg = int(reg_str)
+                for t in targets:
+                    s = edge_signs.get(reg_str, {}).get(str(t), 1)
+                    G.add_edge(reg, t, sign=s)
+            n_edges = G.number_of_edges()
+            print(f'  {q} col{col}  {wid}  ({atype})  edges={n_edges}')
+
+            in_deg = meta.get('in_degrees', {})
+            in_deg_arr = np.array([int(in_deg.get(str(i), 0)) for i in range(dma.G)])
+            sizes = 200 + 80 * in_deg_arr
+            pos = nx.circular_layout(G)
+            edge_color = []
+            for u, v, d in G.edges(data=True):
+                edge_color.append('#e74c3c' if d.get('sign', 1) < 0 else '#2c3e50')
+            nx.draw_networkx_nodes(G, pos, ax=ax, node_size=sizes,
+                                   node_color='#3498db', edgecolors='white', linewidths=1.2)
+            nx.draw_networkx_edges(G, pos, ax=ax, edge_color=edge_color,
+                                   arrows=True, arrowsize=10, width=1.1,
+                                   connectionstyle='arc3,rad=0.08')
+            nx.draw_networkx_labels(G, pos, ax=ax, font_size=10, font_color='white',
+                                    font_weight='bold')
+            ax.set_title(
+                f'{q} — {wid} ({atype})\n{range_label}  std={std_local:.2f}  edges={n_edges}',
+                fontsize=9)
+            ax.axis('off')
+
+    legend_elems = [
+        plt.Line2D([0], [0], color='#2c3e50', lw=2, label='activation'),
+        plt.Line2D([0], [0], color='#e74c3c', lw=2, label='repression'),
+        plt.scatter([], [], s=200, c='#3498db', label='gene (node size ∝ in-degree)'),
+    ]
+    fig.legend(handles=legend_elems, loc='upper center', ncol=3, fontsize=10,
+               bbox_to_anchor=(0.5, 0.995))
+    fig.suptitle(
+        'Topology Exemplars by In-Degree Std Quartile\n'
+        '(each row = one quartile; node size ∝ in-degree; red = repression, dark = activation)',
+        fontsize=12, fontweight='bold', y=1.02)
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.95)
+    fig.savefig(os.path.join(FIGURES_DIR, 'topology_exemplars_in_degree.png'),
+                dpi=150, bbox_inches='tight')
+    plt.close(fig)
+    print('  topology exemplars saved: topology_exemplars_in_degree.png')
+
+
+def plot_topology_exemplars_out_degree(all_results: List[Dict[str, Any]]):
+    """Draw directed graph structure for 2 worlds per out-degree std quartile (Q1-Q4)."""
+    try:
+        import networkx as nx
+    except ImportError:
+        print('  skip out-degree topology exemplars: networkx not installed')
+        return
+
+    world_data = []
+    for r in all_results:
+        meta_path = os.path.join(METADATA_DIR, f'{r["world_id"]}.json')
+        if not os.path.exists(meta_path):
+            continue
+        with open(meta_path) as f:
+            meta = json.load(f)
+        out_deg = meta.get('out_degrees', {})
+        if not out_deg:
+            continue
+        values = np.array([int(v) for v in out_deg.values()], dtype=float)
+        std = float(np.std(values, ddof=0))
+        world_data.append((r['world_id'], std, meta, r.get('primary_attractor', '?')))
+
+    if not world_data:
+        return
+
+    stds = np.array([w[1] for w in world_data])
+    q25, q50, q75 = np.percentile(stds, [25, 50, 75])
+
+    def bucket(s):
+        if s < q25:    return 'Q1 (low)'
+        if s < q50:    return 'Q2'
+        if s < q75:    return 'Q3'
+        return 'Q4 (high)'
+
+    quartiles = ['Q1 (low)', 'Q2', 'Q3', 'Q4 (high)']
+    bucket_edges = [0.0, q25, q50, q75, np.inf]
+
+    selected = {q: [] for q in quartiles}
+    for wid, std, meta, atype in world_data:
+        b = bucket(std)
+        topo_idx = meta.get('topo_idx')
+        seen_topo = {m.get('topo_idx') for _, m, _ in selected[b]}
+        if topo_idx in seen_topo:
+            continue
+        if len(selected[b]) == 0 and atype != 'Type A':
+            continue
+        if len(selected[b]) >= 2:
+            continue
+        if len(selected[b]) == 1 and atype == 'Type A':
+            continue
+        if len(selected[b]) == 1 and atype not in ('Type C', 'Type D', 'Type E'):
+            continue
+        selected[b].append((wid, meta, atype))
+        if all(len(selected[q]) >= 2 for q in quartiles):
+            break
+    if not all(len(selected[q]) >= 2 for q in quartiles):
+        for wid, std, meta, atype in world_data:
+            b = bucket(std)
+            topo_idx = meta.get('topo_idx')
+            seen_topo = {m.get('topo_idx') for _, m, _ in selected[b]}
+            if topo_idx in seen_topo:
+                continue
+            if len(selected[b]) >= 2:
+                continue
+            if len(selected[b]) == 1 and atype == 'Type A':
+                continue
+            selected[b].append((wid, meta, atype))
+            if all(len(selected[q]) >= 2 for q in quartiles):
+                break
+
+    fig, axes = plt.subplots(4, 2, figsize=(10, 16))
+    for row, q in enumerate(quartiles):
+        edges = bucket_edges[row:row + 2]
+        if row < 3:
+            range_label = f'std ∈ [{edges[0]:.2f}, {edges[1]:.2f})'
+        else:
+            range_label = f'std ≥ {edges[0]:.2f}'
+        for col in range(2):
+            ax = axes[row, col]
+            if col >= len(selected[q]):
+                ax.axis('off')
+                continue
+            wid, meta, atype = selected[q][col]
+            out_deg_meta = meta.get('out_degrees', {})
+            std_local = float(np.std([int(v) for v in out_deg_meta.values()], ddof=0))
+            G = nx.DiGraph()
+            G.add_nodes_from(range(dma.G))
+            P_graph = meta.get('P_graph', {})
+            edge_signs = meta.get('edge_signs', {})
+            for reg_str, targets in P_graph.items():
+                reg = int(reg_str)
+                for t in targets:
+                    s = edge_signs.get(reg_str, {}).get(str(t), 1)
+                    G.add_edge(reg, t, sign=s)
+            n_edges = G.number_of_edges()
+            print(f'  {q} col{col}  {wid}  ({atype})  edges={n_edges}')
+
+            out_deg = meta.get('out_degrees', {})
+            out_deg_arr = np.array([int(out_deg.get(str(i), 0)) for i in range(dma.G)])
+            sizes = 200 + 80 * out_deg_arr
+            pos = nx.circular_layout(G)
+            edge_color = []
+            for u, v, d in G.edges(data=True):
+                edge_color.append('#e74c3c' if d.get('sign', 1) < 0 else '#2c3e50')
+            nx.draw_networkx_nodes(G, pos, ax=ax, node_size=sizes,
+                                   node_color='#3498db', edgecolors='white', linewidths=1.2)
+            nx.draw_networkx_edges(G, pos, ax=ax, edge_color=edge_color,
+                                   arrows=True, arrowsize=10, width=1.1,
+                                   connectionstyle='arc3,rad=0.08')
+            nx.draw_networkx_labels(G, pos, ax=ax, font_size=10, font_color='white',
+                                    font_weight='bold')
+            ax.set_title(
+                f'{q} — {wid} ({atype})\n{range_label}  std={std_local:.2f}  edges={n_edges}',
+                fontsize=9)
+            ax.axis('off')
+
+    legend_elems = [
+        plt.Line2D([0], [0], color='#2c3e50', lw=2, label='activation'),
+        plt.Line2D([0], [0], color='#e74c3c', lw=2, label='repression'),
+        plt.scatter([], [], s=200, c='#3498db', label='gene (node size ∝ out-degree)'),
+    ]
+    fig.legend(handles=legend_elems, loc='upper center', ncol=3, fontsize=10,
+               bbox_to_anchor=(0.5, 0.995))
+    fig.suptitle(
+        'Topology Exemplars by Out-Degree Std Quartile\n'
+        '(each row = one quartile; node size ∝ out-degree; red = repression, dark = activation)',
+        fontsize=12, fontweight='bold', y=1.02)
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.95)
+    fig.savefig(os.path.join(FIGURES_DIR, 'topology_exemplars_out_degree.png'),
+                dpi=150, bbox_inches='tight')
+    plt.close(fig)
+    print('  topology exemplars saved: topology_exemplars_out_degree.png')
 
 
 def write_topo_analysis_json(topo_analysis: Dict[str, Any]):
@@ -1331,7 +1691,7 @@ def plot_perturbation_trajectories():
             pert_at = pert.get('perturbed_attractor', atype)
 
             ax_left = axes[r, 0]
-            for g in range(min(dma.G, 10)):
+            for g in range(dma.G):
                 ax_left.plot(orig_X[:, g], alpha=0.9, linewidth=0.8)
             ax_left.axvline(x=PERTURBATION_TIME, color='gray', linestyle='--', linewidth=0.8, alpha=0.6)
             ax_left.set_title(
@@ -1345,7 +1705,7 @@ def plot_perturbation_trajectories():
                     fontsize=10)
 
             ax_right = axes[r, 1]
-            for g in range(min(dma.G, 10)):
+            for g in range(dma.G):
                 ax_right.plot(pert_X[:, g], alpha=0.9, linewidth=0.8)
             ax_right.axvline(x=PERTURBATION_TIME, color='red', linestyle='--', linewidth=0.8, alpha=0.6)
             ax_right.set_title(
@@ -1407,7 +1767,10 @@ def main():
     plot_clipping_distribution(all_results)
     plot_topo_strength_interaction(topo_analysis)
     plot_repression_ratio_vs_stability(all_results)
-    plot_degree_distribution_vs_stability(all_results)
+    plot_in_degree_distribution_vs_stability(all_results)
+    plot_out_degree_distribution_vs_stability(all_results)
+    plot_topology_exemplars_in_degree(all_results)
+    plot_topology_exemplars_out_degree(all_results)
     plot_clipping_dominated_by_regime(all_results)
     plot_all_worlds_trajectories()
 

@@ -23,7 +23,7 @@
     "divergent": false,
     "collapsed": false,
     "max_expression": 4.395683889071741,
-    "final_mean_expression": 0.7860959981135625
+    "final_mean_expression": 0.7851717679629306
   },
   {
     "world_id": "chen_stress_balanced_t008",
@@ -49,7 +49,7 @@
     "divergent": false,
     "collapsed": false,
     "max_expression": 5.629494185485147,
-    "final_mean_expression": 1.364613623561592
+    "final_mean_expression": 1.3646798776974407
   },
   {
     "world_id": "chen_stress_repression_biased_t001",
@@ -75,7 +75,7 @@
     "divergent": false,
     "collapsed": false,
     "max_expression": 1.6002609999182815,
-    "final_mean_expression": 0.469701926413431
+    "final_mean_expression": 0.4696973165099205
   },
   {
     "world_id": "stress_repression_biased_t006",
@@ -93,10 +93,10 @@
     "knockdown_gene": 10,
     "knockdown_gene_expr_at_intervention": 1.1991836534358453,
     "intervention_time": 500,
-    "recovery_time": 558,
+    "recovery_time": 557,
     "recovery_failure": false,
     "equilibrium_converged": true,
-    "equilibrium_time": 58,
+    "equilibrium_time": 57,
     "oscillation_type": "none",
     "divergent": false,
     "collapsed": false,
@@ -119,15 +119,15 @@
     "knockdown_gene": 6,
     "knockdown_gene_expr_at_intervention": 1.2831974791552412,
     "intervention_time": 500,
-    "recovery_time": 537,
+    "recovery_time": 536,
     "recovery_failure": false,
     "equilibrium_converged": true,
-    "equilibrium_time": 37,
+    "equilibrium_time": 36,
     "oscillation_type": "none",
     "divergent": false,
     "collapsed": false,
     "max_expression": 1.2831976825765639,
-    "final_mean_expression": 0.5744337984110099
+    "final_mean_expression": 0.5744337984110095
   },
   {
     "world_id": "stress_repression_biased_t007",
@@ -152,8 +152,8 @@
     "oscillation_type": "none",
     "divergent": true,
     "collapsed": false,
-    "max_expression": 63288888.82020182,
-    "final_mean_expression": 11725980.031387985
+    "max_expression": 64673831.865157776,
+    "final_mean_expression": 11982578.218680233
   },
   {
     "world_id": "stress_balanced_t000",
@@ -178,8 +178,8 @@
     "oscillation_type": "none",
     "divergent": true,
     "collapsed": false,
-    "max_expression": 1.6529001351834483e+25,
-    "final_mean_expression": 3.401032860830376e+24
+    "max_expression": 1.750251669540842e+25,
+    "final_mean_expression": 3.601344882321623e+24
   },
   {
     "world_id": "chen_stress_balanced_t005",
@@ -197,10 +197,10 @@
     "knockdown_gene": 15,
     "knockdown_gene_expr_at_intervention": 10.405436587941596,
     "intervention_time": 500,
-    "recovery_time": 546,
+    "recovery_time": 545,
     "recovery_failure": false,
     "equilibrium_converged": true,
-    "equilibrium_time": 46,
+    "equilibrium_time": 45,
     "oscillation_type": "none",
     "divergent": false,
     "collapsed": false,
@@ -223,10 +223,10 @@
     "knockdown_gene": 3,
     "knockdown_gene_expr_at_intervention": 2.6877686196043666,
     "intervention_time": 500,
-    "recovery_time": 545,
+    "recovery_time": 544,
     "recovery_failure": false,
     "equilibrium_converged": true,
-    "equilibrium_time": 45,
+    "equilibrium_time": 44,
     "oscillation_type": "none",
     "divergent": false,
     "collapsed": false,
