@@ -1,0 +1,940 @@
+{
+  "combo_stats": {},
+  "tf_restricted_d0p1_baseline_balanced": {
+    "combo_key": "tf_restricted_d0p1_baseline_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.1,
+    "strength_regime": "baseline",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.9,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.1,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 158.9111111111111,
+    "mean_clipping_frequency": 0.155675,
+    "mean_spectral_radius": 0.9572837735843382,
+    "regime_tally": {
+      "Convergent": 9,
+      "Divergent": 1
+    }
+  },
+  "tf_restricted_d0p1_baseline_repression_biased": {
+    "combo_key": "tf_restricted_d0p1_baseline_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.1,
+    "strength_regime": "baseline",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 196.51999999999998,
+    "mean_clipping_frequency": 0.235188,
+    "mean_spectral_radius": 0.9547612284129944,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p1_chen_moderate_balanced": {
+    "combo_key": "tf_restricted_d0p1_chen_moderate_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.1,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.8,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.2,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 217.6,
+    "mean_clipping_frequency": 0.32538799999999996,
+    "mean_spectral_radius": 1.0318589194657732,
+    "regime_tally": {
+      "Convergent": 8,
+      "Divergent": 2
+    }
+  },
+  "tf_restricted_d0p1_chen_moderate_repression_biased": {
+    "combo_key": "tf_restricted_d0p1_chen_moderate_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.1,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 0.7,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.3,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 111.45714285714283,
+    "mean_clipping_frequency": 0.42134599999999994,
+    "mean_spectral_radius": 1.0457123182878743,
+    "regime_tally": {
+      "Divergent": 3,
+      "Convergent": 7
+    }
+  },
+  "tf_restricted_d0p1_chen_stress_balanced": {
+    "combo_key": "tf_restricted_d0p1_chen_stress_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.1,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.6,
+    "fraction_sustained_oscillatory": 0.1,
+    "fraction_divergent": 0.3,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 138.76666666666668,
+    "mean_clipping_frequency": 0.31994799999999995,
+    "mean_spectral_radius": 1.1879215740830567,
+    "regime_tally": {
+      "Convergent": 6,
+      "Divergent": 3,
+      "Sustained oscillatory": 1
+    }
+  },
+  "tf_restricted_d0p1_chen_stress_repression_biased": {
+    "combo_key": "tf_restricted_d0p1_chen_stress_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.1,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 0.7,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.3,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 154.65714285714287,
+    "mean_clipping_frequency": 0.461003,
+    "mean_spectral_radius": 1.1917387734840676,
+    "regime_tally": {
+      "Divergent": 3,
+      "Convergent": 7
+    }
+  },
+  "tf_restricted_d0p1_stress_balanced": {
+    "combo_key": "tf_restricted_d0p1_stress_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.1,
+    "strength_regime": "stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.7,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.3,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 180.57142857142853,
+    "mean_clipping_frequency": 0.31747000000000003,
+    "mean_spectral_radius": 1.0717266890158639,
+    "regime_tally": {
+      "Convergent": 7,
+      "Divergent": 3
+    }
+  },
+  "tf_restricted_d0p1_stress_repression_biased": {
+    "combo_key": "tf_restricted_d0p1_stress_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.1,
+    "strength_regime": "stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 0.7,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.3,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 121.28571428571429,
+    "mean_clipping_frequency": 0.43894399999999995,
+    "mean_spectral_radius": 1.0923869288270895,
+    "regime_tally": {
+      "Divergent": 3,
+      "Convergent": 7
+    }
+  },
+  "tf_restricted_d0p2_baseline_balanced": {
+    "combo_key": "tf_restricted_d0p2_baseline_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.2,
+    "strength_regime": "baseline",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 47.92,
+    "mean_clipping_frequency": 0.034509,
+    "mean_spectral_radius": 0.8534433174724505,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p2_baseline_repression_biased": {
+    "combo_key": "tf_restricted_d0p2_baseline_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.2,
+    "strength_regime": "baseline",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 48.040000000000006,
+    "mean_clipping_frequency": 0.019858999999999998,
+    "mean_spectral_radius": 0.8381023828206715,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p2_chen_moderate_balanced": {
+    "combo_key": "tf_restricted_d0p2_chen_moderate_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.2,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 96.58,
+    "mean_clipping_frequency": 0.238087,
+    "mean_spectral_radius": 0.9083284800678191,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p2_chen_moderate_repression_biased": {
+    "combo_key": "tf_restricted_d0p2_chen_moderate_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.2,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 98.44,
+    "mean_clipping_frequency": 0.24884900000000001,
+    "mean_spectral_radius": 0.9004448702038097,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p2_chen_stress_balanced": {
+    "combo_key": "tf_restricted_d0p2_chen_stress_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.2,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.7,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.3,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 84.14285714285714,
+    "mean_clipping_frequency": 0.36443,
+    "mean_spectral_radius": 1.0254869067429317,
+    "regime_tally": {
+      "Divergent": 3,
+      "Convergent": 7
+    }
+  },
+  "tf_restricted_d0p2_chen_stress_repression_biased": {
+    "combo_key": "tf_restricted_d0p2_chen_stress_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.2,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 0.8,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.2,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 53.25,
+    "mean_clipping_frequency": 0.475108,
+    "mean_spectral_radius": 1.003824607198275,
+    "regime_tally": {
+      "Divergent": 2,
+      "Convergent": 8
+    }
+  },
+  "tf_restricted_d0p2_stress_balanced": {
+    "combo_key": "tf_restricted_d0p2_stress_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.2,
+    "strength_regime": "stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.8,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.2,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 127.05,
+    "mean_clipping_frequency": 0.32801500000000006,
+    "mean_spectral_radius": 0.9519623063092395,
+    "regime_tally": {
+      "Divergent": 2,
+      "Convergent": 8
+    }
+  },
+  "tf_restricted_d0p2_stress_repression_biased": {
+    "combo_key": "tf_restricted_d0p2_stress_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.2,
+    "strength_regime": "stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 0.8,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.2,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 59.824999999999996,
+    "mean_clipping_frequency": 0.335378,
+    "mean_spectral_radius": 0.9283922677855229,
+    "regime_tally": {
+      "Divergent": 2,
+      "Convergent": 8
+    }
+  },
+  "tf_restricted_d0p4_baseline_balanced": {
+    "combo_key": "tf_restricted_d0p4_baseline_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.4,
+    "strength_regime": "baseline",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 20.119999999999997,
+    "mean_clipping_frequency": 4.000000000000001e-06,
+    "mean_spectral_radius": 0.6351564201608207,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p4_baseline_repression_biased": {
+    "combo_key": "tf_restricted_d0p4_baseline_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.4,
+    "strength_regime": "baseline",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 20.18,
+    "mean_clipping_frequency": 4.000000000000001e-06,
+    "mean_spectral_radius": 0.6517730392944847,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p4_chen_moderate_balanced": {
+    "combo_key": "tf_restricted_d0p4_chen_moderate_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.4,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 26.1,
+    "mean_clipping_frequency": 0.079898,
+    "mean_spectral_radius": 0.7256466061800756,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p4_chen_moderate_repression_biased": {
+    "combo_key": "tf_restricted_d0p4_chen_moderate_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.4,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 26.76,
+    "mean_clipping_frequency": 0.030084000000000007,
+    "mean_spectral_radius": 0.7187053636305362,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p4_chen_stress_balanced": {
+    "combo_key": "tf_restricted_d0p4_chen_stress_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.4,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.9,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.1,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 51.844444444444434,
+    "mean_clipping_frequency": 0.23487200000000003,
+    "mean_spectral_radius": 0.8248266314020591,
+    "regime_tally": {
+      "Convergent": 9,
+      "Divergent": 1
+    }
+  },
+  "tf_restricted_d0p4_chen_stress_repression_biased": {
+    "combo_key": "tf_restricted_d0p4_chen_stress_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.4,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 38.28,
+    "mean_clipping_frequency": 0.20513600000000004,
+    "mean_spectral_radius": 0.8639671749472125,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p4_stress_balanced": {
+    "combo_key": "tf_restricted_d0p4_stress_balanced",
+    "topology_type": "tf_restricted",
+    "delta": 0.4,
+    "strength_regime": "stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 34.92,
+    "mean_clipping_frequency": 0.149787,
+    "mean_spectral_radius": 0.7644123037916681,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "tf_restricted_d0p4_stress_repression_biased": {
+    "combo_key": "tf_restricted_d0p4_stress_repression_biased",
+    "topology_type": "tf_restricted",
+    "delta": 0.4,
+    "strength_regime": "stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 27.159999999999997,
+    "mean_clipping_frequency": 0.11511399999999998,
+    "mean_spectral_radius": 0.743217961753531,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p1_baseline_balanced": {
+    "combo_key": "unrestricted_sparse_d0p1_baseline_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.1,
+    "strength_regime": "baseline",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 207.29999999999995,
+    "mean_clipping_frequency": 0.14693,
+    "mean_spectral_radius": 0.9707866398131759,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p1_baseline_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p1_baseline_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.1,
+    "strength_regime": "baseline",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 146.66,
+    "mean_clipping_frequency": 0.21607500000000002,
+    "mean_spectral_radius": 0.9767401377209929,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p1_chen_moderate_balanced": {
+    "combo_key": "unrestricted_sparse_d0p1_chen_moderate_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.1,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.4,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.6,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 179.35,
+    "mean_clipping_frequency": 0.308024,
+    "mean_spectral_radius": 1.0648147573212179,
+    "regime_tally": {
+      "Divergent": 6,
+      "Convergent": 4
+    }
+  },
+  "unrestricted_sparse_d0p1_chen_moderate_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p1_chen_moderate_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.1,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 0.9,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.1,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 138.93333333333334,
+    "mean_clipping_frequency": 0.429879,
+    "mean_spectral_radius": 1.0713767686511446,
+    "regime_tally": {
+      "Convergent": 9,
+      "Divergent": 1
+    }
+  },
+  "unrestricted_sparse_d0p1_chen_stress_balanced": {
+    "combo_key": "unrestricted_sparse_d0p1_chen_stress_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.1,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.3,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.7,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 208.46666666666667,
+    "mean_clipping_frequency": 0.32158600000000004,
+    "mean_spectral_radius": 1.2144039234425965,
+    "regime_tally": {
+      "Divergent": 7,
+      "Convergent": 3
+    }
+  },
+  "unrestricted_sparse_d0p1_chen_stress_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p1_chen_stress_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.1,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 0.8,
+    "fraction_sustained_oscillatory": 0.1,
+    "fraction_divergent": 0.1,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 150.75,
+    "mean_clipping_frequency": 0.44076700000000013,
+    "mean_spectral_radius": 1.2367631347336334,
+    "regime_tally": {
+      "Convergent": 8,
+      "Sustained oscillatory": 1,
+      "Divergent": 1
+    }
+  },
+  "unrestricted_sparse_d0p1_stress_balanced": {
+    "combo_key": "unrestricted_sparse_d0p1_stress_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.1,
+    "strength_regime": "stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.3,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.7,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 174.0666666666667,
+    "mean_clipping_frequency": 0.31296099999999993,
+    "mean_spectral_radius": 1.1327372471700559,
+    "regime_tally": {
+      "Divergent": 7,
+      "Convergent": 3
+    }
+  },
+  "unrestricted_sparse_d0p1_stress_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p1_stress_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.1,
+    "strength_regime": "stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 142.01999999999998,
+    "mean_clipping_frequency": 0.44721299999999997,
+    "mean_spectral_radius": 1.1295723566548825,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p2_baseline_balanced": {
+    "combo_key": "unrestricted_sparse_d0p2_baseline_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.2,
+    "strength_regime": "baseline",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 50.2,
+    "mean_clipping_frequency": 0.029732,
+    "mean_spectral_radius": 0.8677361177759589,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p2_baseline_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p2_baseline_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.2,
+    "strength_regime": "baseline",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 50.04,
+    "mean_clipping_frequency": 0.039657,
+    "mean_spectral_radius": 0.8692666198986165,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p2_chen_moderate_balanced": {
+    "combo_key": "unrestricted_sparse_d0p2_chen_moderate_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.2,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 89.16000000000001,
+    "mean_clipping_frequency": 0.24323199999999998,
+    "mean_spectral_radius": 0.9929786174003576,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p2_chen_moderate_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p2_chen_moderate_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.2,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 103.54,
+    "mean_clipping_frequency": 0.243381,
+    "mean_spectral_radius": 0.9709131852814131,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p2_chen_stress_balanced": {
+    "combo_key": "unrestricted_sparse_d0p2_chen_stress_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.2,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.7,
+    "fraction_sustained_oscillatory": 0.2,
+    "fraction_divergent": 0.1,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 65.97142857142858,
+    "mean_clipping_frequency": 0.352874,
+    "mean_spectral_radius": 1.1934677282585269,
+    "regime_tally": {
+      "Divergent": 1,
+      "Convergent": 7,
+      "Sustained oscillatory": 2
+    }
+  },
+  "unrestricted_sparse_d0p2_chen_stress_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p2_chen_stress_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.2,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 0.7,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.3,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 76.94285714285716,
+    "mean_clipping_frequency": 0.455189,
+    "mean_spectral_radius": 1.140294330278984,
+    "regime_tally": {
+      "Convergent": 7,
+      "Divergent": 3
+    }
+  },
+  "unrestricted_sparse_d0p2_stress_balanced": {
+    "combo_key": "unrestricted_sparse_d0p2_stress_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.2,
+    "strength_regime": "stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 113.88,
+    "mean_clipping_frequency": 0.262427,
+    "mean_spectral_radius": 1.0495579654612504,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p2_stress_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p2_stress_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.2,
+    "strength_regime": "stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 0.7,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.1,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.2,
+    "mean_convergence_time": 72.97142857142858,
+    "mean_clipping_frequency": 0.362613,
+    "mean_spectral_radius": 1.0331249024196654,
+    "regime_tally": {
+      "Convergent": 7,
+      "Ambiguous": 2,
+      "Divergent": 1
+    }
+  },
+  "unrestricted_sparse_d0p4_baseline_balanced": {
+    "combo_key": "unrestricted_sparse_d0p4_baseline_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.4,
+    "strength_regime": "baseline",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 20.1,
+    "mean_clipping_frequency": 0.0,
+    "mean_spectral_radius": 0.6605606499088588,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p4_baseline_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p4_baseline_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.4,
+    "strength_regime": "baseline",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 20.4,
+    "mean_clipping_frequency": 1.2000000000000002e-05,
+    "mean_spectral_radius": 0.6694419870848609,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p4_chen_moderate_balanced": {
+    "combo_key": "unrestricted_sparse_d0p4_chen_moderate_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.4,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 27.46,
+    "mean_clipping_frequency": 0.03999199999999999,
+    "mean_spectral_radius": 0.7540372462092564,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p4_chen_moderate_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p4_chen_moderate_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.4,
+    "strength_regime": "chen_moderate",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 27.98,
+    "mean_clipping_frequency": 0.055008,
+    "mean_spectral_radius": 0.7707945355149729,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p4_chen_stress_balanced": {
+    "combo_key": "unrestricted_sparse_d0p4_chen_stress_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.4,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 0.9,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.1,
+    "mean_convergence_time": 47.44444444444445,
+    "mean_clipping_frequency": 0.215042,
+    "mean_spectral_radius": 0.9163750324712018,
+    "regime_tally": {
+      "Ambiguous": 1,
+      "Convergent": 9
+    }
+  },
+  "unrestricted_sparse_d0p4_chen_stress_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p4_chen_stress_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.4,
+    "strength_regime": "chen_stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 48.1,
+    "mean_clipping_frequency": 0.25499599999999994,
+    "mean_spectral_radius": 0.9442916293557964,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p4_stress_balanced": {
+    "combo_key": "unrestricted_sparse_d0p4_stress_balanced",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.4,
+    "strength_regime": "stress",
+    "sign_ratio": "balanced",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 33.18,
+    "mean_clipping_frequency": 0.11479599999999998,
+    "mean_spectral_radius": 0.8202061879132583,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  },
+  "unrestricted_sparse_d0p4_stress_repression_biased": {
+    "combo_key": "unrestricted_sparse_d0p4_stress_repression_biased",
+    "topology_type": "unrestricted_sparse",
+    "delta": 0.4,
+    "strength_regime": "stress",
+    "sign_ratio": "repression_biased",
+    "N_world": 10,
+    "fraction_convergent": 1.0,
+    "fraction_sustained_oscillatory": 0.0,
+    "fraction_divergent": 0.0,
+    "fraction_collapse": 0.0,
+    "fraction_ambiguous": 0.0,
+    "mean_convergence_time": 31.32,
+    "mean_clipping_frequency": 0.115137,
+    "mean_spectral_radius": 0.8159695257968153,
+    "regime_tally": {
+      "Convergent": 10
+    }
+  }
+}

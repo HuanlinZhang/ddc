@@ -1,0 +1,31 @@
+level	topology_type	delta	strength_regime	N_world	fraction_convergent	fraction_divergent	fraction_collapse	fraction_sustained_oscillatory	clipping_dominated_fraction	sustained_oscillation_count	first_divergent_regime
+topology_x_delta	unrestricted_sparse	0.1		80	0.7125	0.275	0.0	0.0125	0.95	2	chen_moderate
+topology_x_delta	unrestricted_sparse	0.2		80	0.8875	0.0625	0.0	0.025	0.75	2	
+topology_x_delta	unrestricted_sparse	0.4		80	0.9875	0.0	0.0	0.0	0.45	0	
+topology_x_delta	tf_restricted	0.1		80	0.7625	0.225	0.0	0.0125	0.9375	1	
+topology_x_delta	tf_restricted	0.2		80	0.8875	0.1125	0.0	0.0	0.7375	0	
+topology_x_delta	tf_restricted	0.4		80	0.9875	0.0125	0.0	0.0	0.4375	0	
+topology_x_delta_x_strength	unrestricted_sparse	0.1	baseline	20	1.0	0.0	0.0	0.0	0.8	1	
+topology_x_delta_x_strength	unrestricted_sparse	0.1	chen_moderate	20	0.65	0.35	0.0	0.0	1.0	0	
+topology_x_delta_x_strength	unrestricted_sparse	0.1	stress	20	0.65	0.35	0.0	0.0	1.0	0	
+topology_x_delta_x_strength	unrestricted_sparse	0.1	chen_stress	20	0.55	0.4	0.0	0.05	1.0	1	
+topology_x_delta_x_strength	unrestricted_sparse	0.2	baseline	20	1.0	0.0	0.0	0.0	0.0	0	
+topology_x_delta_x_strength	unrestricted_sparse	0.2	chen_moderate	20	1.0	0.0	0.0	0.0	1.0	0	
+topology_x_delta_x_strength	unrestricted_sparse	0.2	stress	20	0.85	0.05	0.0	0.0	1.0	0	
+topology_x_delta_x_strength	unrestricted_sparse	0.2	chen_stress	20	0.7	0.2	0.0	0.1	1.0	2	
+topology_x_delta_x_strength	unrestricted_sparse	0.4	baseline	20	1.0	0.0	0.0	0.0	0.0	0	
+topology_x_delta_x_strength	unrestricted_sparse	0.4	chen_moderate	20	1.0	0.0	0.0	0.0	0.1	0	
+topology_x_delta_x_strength	unrestricted_sparse	0.4	stress	20	1.0	0.0	0.0	0.0	0.7	0	
+topology_x_delta_x_strength	unrestricted_sparse	0.4	chen_stress	20	0.95	0.0	0.0	0.0	1.0	0	
+topology_x_delta_x_strength	tf_restricted	0.1	baseline	20	0.95	0.05	0.0	0.0	0.75	0	
+topology_x_delta_x_strength	tf_restricted	0.1	chen_moderate	20	0.75	0.25	0.0	0.0	1.0	0	
+topology_x_delta_x_strength	tf_restricted	0.1	stress	20	0.7	0.3	0.0	0.0	1.0	0	
+topology_x_delta_x_strength	tf_restricted	0.1	chen_stress	20	0.65	0.3	0.0	0.05	1.0	1	
+topology_x_delta_x_strength	tf_restricted	0.2	baseline	20	1.0	0.0	0.0	0.0	0.1	0	
+topology_x_delta_x_strength	tf_restricted	0.2	chen_moderate	20	1.0	0.0	0.0	0.0	0.85	0	
+topology_x_delta_x_strength	tf_restricted	0.2	stress	20	0.8	0.2	0.0	0.0	1.0	0	
+topology_x_delta_x_strength	tf_restricted	0.2	chen_stress	20	0.75	0.25	0.0	0.0	1.0	0	
+topology_x_delta_x_strength	tf_restricted	0.4	baseline	20	1.0	0.0	0.0	0.0	0.0	0	
+topology_x_delta_x_strength	tf_restricted	0.4	chen_moderate	20	1.0	0.0	0.0	0.0	0.2	0	
+topology_x_delta_x_strength	tf_restricted	0.4	stress	20	1.0	0.0	0.0	0.0	0.75	0	
+topology_x_delta_x_strength	tf_restricted	0.4	chen_stress	20	0.95	0.05	0.0	0.0	0.8	0	
