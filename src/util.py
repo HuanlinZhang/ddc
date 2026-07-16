@@ -10,6 +10,59 @@ All trajectory-analysis functions accept torch.Tensor (matching
 run_002 / 004 / 005).  Matrix-building functions return numpy arrays.
 
 Default thresholds assume b = 10.
+
+────────────────────────────────────────────────────────────────────
+Revision history (oscillation detection & regime classification)
+────────────────────────────────────────────────────────────────────
+
+[2025-07-15] Overhauled oscillation detection and regime classification.
+
+  Background: run_007 add-on diagnostic discovered that 388 trajectories
+  labeled 'Sustained oscillatory' were actually Convergent (false positives
+  caused by bugs in the original analyze_oscillation).  Root-cause analysis
+  identified three bugs and one design flaw:
+
+  Bugs in original analyze_oscillation (now deprecated):
+    1. Analysis window: required conv_time > burn_in + 100 (i.e. > 300)
+       to truncate the converged tail.  Trajectories with conv_time in
+       [200, 300] had 700+ steps of converged tail mixed in, producing
+       float64-noise-level false extrema.
+    2. Damping default: when peak_pairs < 4, damping was set to 0.0.
+       This 0.0 was then interpreted as "no damping" (i.e. sustained),
+       rather than "cannot compute".  False positives ensued.
+    3. Noise threshold: signal_range filter used epsilon=1e-4, which
+       float64 numerical noise in the converged tail can exceed.
+
+  Design flaw in original classify_attractor (now deprecated):
+    - Oscillation check had higher priority than convergence check.
+      Even when converged=True, a (false) 'sustained' oscillation label
+      would override it, yielding Type D instead of Type A/B.
+    - This contradicts run_004 §6-9 which states: "damped oscillation
+      that converges → primary_regime = Convergent".
+
+  New functions (replacing the originals):
+    - analyze_oscillation(): only answers "does oscillation exist?"
+      (oscillation_exists: bool).  No longer returns oscillation_type.
+      Three fixes applied (see function docstring).
+    - classify_regime(): directly outputs primary regime name (no Type
+      A-G intermediate layer).  Priority: Divergent > Collapse >
+      Convergent > Sustained oscillatory > Ambiguous.
+    - compute_secondary_label(): outputs List[str] of secondary labels
+      per Level_0_Model_Spec §6.  Multi-select: clipping labels can
+      co-occur with convergence labels.
+      [2026-07-16] Return type changed from str to List[str]; added
+      'clipping-dominated' and 'low-clipping / linear-like'; renamed
+      'divergent'->'runaway divergence', 'collapsed'->'numerical collapse'.
+    - classify_attractor(): kept as deprecated alias for backward compat.
+    - Old analyze_oscillation / classify_attractor retained as
+      _legacy_* for reference but should not be used in new code.
+
+  Convergence threshold scaling (in run_007 compute_dynamic_thresholds):
+    - epsilon for detect_equilibrium now scales with b/δ:
+      scaled_epsilon = 1e-4 * max(b/δ, 1.0)
+      This ensures consistent relative precision across parameter combos
+      where equilibrium X* ≈ b/δ ranges from 0.5 to 300.
+    - min_absolute_amplitude for analyze_oscillation scales the same way.
 """
 
 import numpy as np
@@ -140,6 +193,9 @@ def detect_equilibrium(
         'convergence_time': conv_time,
         'equilibrium_magnitude': eq_magnitude,
         'equilibrium_sparsity': eq_sparsity,
+        # [2026-07-16] Per §6: must report convergence tolerance and window
+        'convergence_tolerance': epsilon,
+        'convergence_window': window,
     }
 
 
@@ -163,14 +219,19 @@ def analyze_stability(
       divergence_time        int | None
       numerical_collapse     bool
       clipping_dominated     bool
+      clipping_frequency     float
       total_clips            int
+      has_numerical_error    bool   [2026-07-16] per §5 NaN/Inf check
     """
+    has_numerical_error = bool(torch.isnan(X_traj).any() or torch.isinf(X_traj).any())
+
     max_expression = float(X_traj.max().item())
     bounded = max_expression < divergence_threshold
     final_mean = float(X_traj[-1].mean().item())
     collapsed = final_mean < collapse_threshold
-    total_steps = X_traj.shape[0]
-    clipping_dominated = total_clips > total_steps * G * clipping_frac_threshold
+    total_steps = X_traj.shape[0] - 1  # update steps (t=1..T), excluding initial state
+    clipping_frequency = total_clips / (total_steps * G) if (total_steps * G) > 0 else 0.0
+    clipping_dominated = clipping_frequency > clipping_frac_threshold
 
     divergence_time = None
     if not bounded:
@@ -188,11 +249,13 @@ def analyze_stability(
         'divergence_time': divergence_time,
         'numerical_collapse': collapsed,
         'clipping_dominated': clipping_dominated,
+        'clipping_frequency': clipping_frequency,
         'total_clips': total_clips,
+        'has_numerical_error': has_numerical_error,
     }
 
 
-def analyze_oscillation(
+def _legacy_analyze_oscillation(
     X_traj: torch.Tensor,
     converged: bool,
     conv_time: int,
@@ -201,7 +264,14 @@ def analyze_oscillation(
     min_relative_amplitude: float = 0.01,
     damping_threshold: float = 0.05,
 ) -> Dict[str, Any]:
-    """Detect oscillation via extrema-based analysis (run_002 algorithm).
+    """[DEPRECATED] Original oscillation detection (run_002 algorithm).
+
+    Retained for reference.  Use analyze_oscillation() instead.
+
+    Known bugs:
+      1. Window requires conv_time > burn_in + 100 to truncate tail
+      2. peak_pairs < 4 -> damping=0.0 (misinterpreted as 'no damping')
+      3. signal_range filter uses epsilon (too low for noise filtering)
 
     Identifies local peaks/troughs per gene and classifies oscillations
     as 'sustained' or 'damped' based on the median amplitude trend
@@ -312,22 +382,20 @@ def analyze_oscillation(
     }
 
 
-def classify_attractor(
+def _legacy_classify_attractor(
     eq: Dict[str, Any],
     st: Dict[str, Any],
     osc: Dict[str, Any],
     slow_convergence_threshold: int = SLOW_CONVERGENCE_THRESHOLD,
 ) -> str:
-    """Classify attractor type (Type A–G) per run_002 convention.
+    """[DEPRECATED] Original attractor classification (Type A-G).
 
-    Priority order:
-      Type E — Runaway divergence (not bounded)
-      Type F — Numerical collapse   (collapsed)
-      Type D — Sustained oscillation
-      Type C — Damped oscillation
-      Type A — Fast convergence      (converged, conv_time ≤ threshold)
-      Type B — Slow convergence      (converged, conv_time > threshold)
-      Type G — Others / ambiguous
+    Retained for backward compatibility.  Use classify_regime() instead.
+
+    Known design flaw:
+      - Oscillation check has higher priority than convergence check.
+        When osc['oscillation_type'] == 'sustained', returns Type D
+        even if converged=True, contradicting run_004 sec 6-9.
     """
     if st['divergence_existence']:
         return 'Type E'
@@ -343,6 +411,297 @@ def classify_attractor(
             return 'Type A'
         return 'Type B'
     return 'Type G'
+
+
+def classify_attractor(
+    eq: Dict[str, Any],
+    st: Dict[str, Any],
+    osc: Dict[str, Any],
+    slow_convergence_threshold: int = SLOW_CONVERGENCE_THRESHOLD,
+) -> str:
+    """Backward-compatible wrapper returning Type A-G labels.
+
+    Internally calls classify_regime() and maps back to Type labels
+    for code that still expects the old Type A-G convention.
+
+    Mapping:
+      Convergent + fast           -> Type A
+      Convergent + slow           -> Type B
+      Convergent + damped osc     -> Type C
+      Sustained oscillatory       -> Type D
+      Divergent                   -> Type E
+      Collapse                    -> Type F
+      Ambiguous                   -> Type G
+    """
+    _REGIME_TO_TYPE = {
+        'Convergent':           None,   # need secondary to distinguish A/B/C
+        'Sustained oscillatory': 'Type D',
+        'Divergent':            'Type E',
+        'Collapse':             'Type F',
+        'Ambiguous':            'Type G',
+    }
+
+    regime = classify_regime(eq, st, osc, slow_convergence_threshold)
+
+    if regime == 'Convergent':
+        sec_labels = compute_secondary_label(eq, st, osc, slow_convergence_threshold)
+        if 'damped oscillatory transient' in sec_labels:
+            return 'Type C'
+        if 'fast convergence' in sec_labels:
+            return 'Type A'
+        return 'Type B'
+
+    return _REGIME_TO_TYPE.get(regime, 'Type G')
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Corrected regime classification (per run_004 document sec 6-9)
+#
+# Design principles:
+#   - analyze_oscillation only answers: does oscillation exist?
+#     It does NOT classify sustained vs damped.
+#   - classify_regime determines primary_regime directly (no Type A-G
+#     intermediate layer).
+#   - converged takes priority over oscillation:
+#       converged + oscillation -> Convergent (damped_oscillatory_transient)
+#       converged + no oscillation -> Convergent (fast/slow_convergence)
+#       not converged + oscillation -> Sustained oscillatory
+#       not converged + no oscillation -> Ambiguous
+#   - Three fixes vs original _legacy_analyze_oscillation:
+#       1. Window: truncate to [burn_in, conv_time] when conv_time > burn_in
+#          (original required conv_time > burn_in + 100)
+#       2. peak_pairs < 4 -> skip gene (original set damping=0.0)
+#       3. Absolute amplitude floor: min_absolute_amplitude=1e-3
+#          (original used epsilon=1e-4)
+# ═══════════════════════════════════════════════════════════════════
+
+MIN_ABSOLUTE_AMPLITUDE: float = 1e-3
+
+
+def analyze_oscillation(
+    X_traj: torch.Tensor,
+    converged: bool,
+    conv_time: int,
+    epsilon: float = EPSILON,
+    burn_in: int = 200,
+    min_relative_amplitude: float = 0.01,
+    min_absolute_amplitude: float = MIN_ABSOLUTE_AMPLITUDE,
+    damping_threshold: float = 0.05,
+) -> Dict[str, Any]:
+    """Detect whether oscillation exists in the trajectory.
+
+    Fixes vs _legacy_analyze_oscillation:
+      1. Window: truncate to [burn_in, conv_time] when conv_time > burn_in
+         (original required conv_time > burn_in + 100, leaving the
+         converged tail in the analysis window for conv_time in [200,300])
+      2. peak_pairs < 4 -> skip gene via continue
+         (original set damping=0.0, which was interpreted as "no damping"
+         i.e. sustained, causing false positives)
+      3. Absolute amplitude floor min_absolute_amplitude (default 1e-3)
+         filters numerical noise in the converged tail
+         (original used epsilon=1e-4 which float64 noise can exceed)
+
+    Returns dict with:
+      oscillation_exists   bool
+      amplitude            float
+      frequency            float
+      damping_rate         float | None  (informational only)
+      oscillatory_genes    List[int]
+    """
+    T_total = X_traj.shape[0]
+
+    # Fix 1: truncate window when converged
+    if converged and conv_time > burn_in:
+        end = min(conv_time, T_total)
+        X = X_traj[burn_in:end].numpy()
+    else:
+        X = X_traj[burn_in:].numpy()
+
+    T, G_dim = X.shape
+    if T < 50:
+        return {
+            'oscillation_exists': False,
+            'amplitude': 0.0,
+            'frequency': 0.0,
+            'damping_rate': None,
+            'oscillatory_genes': [],
+        }
+
+    oscillatory_genes: List[int] = []
+    amplitudes: List[float] = []
+    frequencies: List[float] = []
+    damping_rates: List[float] = []
+
+    for g in range(G_dim):
+        x = X[:, g]
+        signal_range = float(x.max() - x.min())
+
+        # Fix 3: absolute amplitude floor (was epsilon=1e-4)
+        if signal_range < min_absolute_amplitude:
+            continue
+
+        extrema = np.zeros(T, dtype=np.int8)
+        for t in range(1, T - 1):
+            if x[t] > x[t - 1] and x[t] > x[t + 1]:
+                extrema[t] = 1
+            elif x[t] < x[t - 1] and x[t] < x[t + 1]:
+                extrema[t] = -1
+
+        ext_idx = np.where(extrema != 0)[0]
+        if len(ext_idx) < 3:
+            continue
+
+        peak_pairs = []
+        for i in range(len(ext_idx) - 1):
+            s, e = ext_idx[i], ext_idx[i + 1]
+            delta = abs(float(x[e] - x[s]))
+            peak_pairs.append(delta)
+
+        if len(peak_pairs) < 2:
+            continue
+
+        gene_amplitude = float(np.median(peak_pairs))
+        relative_amplitude = (gene_amplitude / signal_range
+                              if signal_range > epsilon else 0.0)
+
+        if relative_amplitude < min_relative_amplitude:
+            continue
+
+        gene_freq = len(ext_idx) / (2.0 * T)
+
+        # Fix 2: skip gene when insufficient data for damping calculation
+        if len(peak_pairs) >= 4:
+            mid = len(peak_pairs) // 2
+            early = np.mean(peak_pairs[:mid])
+            late = np.mean(peak_pairs[mid:])
+            damping = float((early - late) / early) if early > epsilon else 0.0
+        else:
+            # Not enough peak pairs to compute damping -> skip this gene
+            continue
+
+        oscillatory_genes.append(g)
+        amplitudes.append(gene_amplitude)
+        frequencies.append(gene_freq)
+        damping_rates.append(damping)
+
+    if not oscillatory_genes:
+        return {
+            'oscillation_exists': False,
+            'amplitude': 0.0,
+            'frequency': 0.0,
+            'damping_rate': None,
+            'oscillatory_genes': [],
+        }
+
+    avg_damping = float(np.median(damping_rates))
+
+    return {
+        'oscillation_exists': True,
+        'amplitude': float(np.mean(amplitudes)),
+        'frequency': float(np.mean(frequencies)),
+        'damping_rate': avg_damping,
+        'oscillatory_genes': oscillatory_genes,
+    }
+
+
+def classify_regime(
+    eq: Dict[str, Any],
+    st: Dict[str, Any],
+    osc: Dict[str, Any],
+    slow_convergence_threshold: int = SLOW_CONVERGENCE_THRESHOLD,
+) -> str:
+    """Classify trajectory into primary regime directly.
+
+    Per Level_0_Model_Spec §6:
+      - Damped oscillation that converges -> primary_regime = Convergent
+      - Sustained oscillation is a distinct primary regime
+      - Type A/B distinction is only a secondary label
+
+    Priority:
+      1. Divergent     (divergence_existence)
+      2. Collapse       (numerical_collapse)
+      3. Convergent     (converged=True; with or without oscillation)
+      4. Sustained oscillatory  (converged=False + oscillation_exists)
+      5. Ambiguous      (converged=False + no oscillation)
+
+    Returns one of:
+      'Convergent', 'Sustained oscillatory', 'Divergent', 'Collapse', 'Ambiguous'
+
+    Note: NaN/Inf/overflow are recorded by analyze_stability() as
+    has_numerical_error (per §5) but do not alter regime classification.
+    Unbounded divergence that overflows float64 to Inf/NaN is still Divergent.
+    """
+    if st['divergence_existence']:
+        return 'Divergent'
+    if st['numerical_collapse']:
+        return 'Collapse'
+
+    if eq['converged']:
+        return 'Convergent'
+
+    # If oscillation exists but trajectory has NOT converged:
+    #   - Damped oscillation (converged=True) was already caught above as Convergent,
+    #     so reaching here means converged=False + oscillation_exists=True.
+    #   - This is either a true sustained oscillation or a slow-damped oscillation
+    #     that has not yet settled within the simulation window.
+    #     Both cases are labeled 'Sustained oscillatory'; disambiguation requires
+    #     extending the simulation (see run_007 add-on diagnostic).
+    if osc.get('oscillation_exists', False):
+        return 'Sustained oscillatory'
+
+    return 'Ambiguous'
+
+
+def compute_secondary_label(
+    eq: Dict[str, Any],
+    st: Dict[str, Any],
+    osc: Dict[str, Any],
+    slow_convergence_threshold: int = SLOW_CONVERGENCE_THRESHOLD,
+) -> List[str]:
+    """Compute secondary labels for trajectory.
+
+    Per Level_0_Model_Spec §6, secondary labels are multi-select:
+      fast convergence
+      slow convergence
+      damped oscillatory transient
+      clipping-dominated
+      low-clipping / linear-like
+      runaway divergence
+      numerical collapse
+
+    Clipping labels are orthogonal to convergence labels and can co-occur.
+
+    [2026-07-16] Changed return type from str to List[str] to support
+    multi-select.  Added missing 'clipping-dominated' and
+    'low-clipping / linear-like' labels.  Renamed 'divergent' ->
+    'runaway divergence' and 'collapsed' -> 'numerical collapse' to
+    match Model Spec terminology.  Removed 'sustained_oscillatory' and
+    'other' which are not in the Model Spec secondary label set.
+    """
+    labels: List[str] = []
+
+    # Stability-driven labels
+    if st['divergence_existence']:
+        labels.append('runaway divergence')
+    if st['numerical_collapse']:
+        labels.append('numerical collapse')
+
+    # Convergence-driven labels (mutually exclusive with each other)
+    if eq['converged']:
+        if osc.get('oscillation_exists', False):
+            labels.append('damped oscillatory transient')
+        if eq['convergence_time'] <= slow_convergence_threshold:
+            labels.append('fast convergence')
+        else:
+            labels.append('slow convergence')
+
+    # Clipping labels (orthogonal, can co-occur with any of the above)
+    if st.get('clipping_dominated', False):
+        labels.append('clipping-dominated')
+    if st.get('clipping_frequency', 1.0) < 0.01 and eq['converged']:
+        labels.append('low-clipping / linear-like')
+
+    return labels
 
 
 def compute_spectral_info(
@@ -424,7 +783,7 @@ def hierarchical_cluster_relative_l2(
     states: List[np.ndarray],
     threshold: float = 1e-3,
     eps: float = EPSILON,
-) -> Tuple[List[int], Optional[List[List[float]]], Optional[List[List[float]]]]:
+) -> Tuple[List[int], Optional[List[List[float]]], Optional[List[List[float]]], Dict[str, Any]]:
     """Agglomerative average-linkage clustering on pairwise relative L2 distance.
 
     Parameters
@@ -437,16 +796,23 @@ def hierarchical_cluster_relative_l2(
     -------
     labels : list[int]        — 0-indexed cluster labels, length n
     abs_dm : (n,n) list[list[float]] | None — absolute L2 distance matrix
-    rel_dm : (n,n) list[list[float]] | None — relative L2 distance matrix
+    rel_dm : (n,n) list[list[float]] | None - relative L2 distance matrix
+    metadata : dict           - clustering parameters for reporting
+        [2026-07-16] Per §6: must report clustering threshold and distance metric
 
     Source: adapted from run_005 (run_005_analysis.py §3 _relative_l2 + _hierarchical_cluster).
     """
     from scipy.cluster.hierarchy import linkage, fcluster
     from scipy.spatial.distance import squareform
 
+    metadata = {
+        'clustering_threshold': threshold,
+        'distance_metric': 'relative L2 (average-linkage)',
+    }
+
     n = len(states)
     if n <= 1:
-        return [0] * n, None, None
+        return [0] * n, None, None, metadata
 
     abs_dm = np.zeros((n, n))
     rel_dm = np.zeros((n, n))
@@ -469,6 +835,7 @@ def hierarchical_cluster_relative_l2(
         labels_raw.tolist(),
         abs_dm.tolist() if abs_dm is not None else None,
         rel_dm.tolist() if rel_dm is not None else None,
+        metadata,
     )
 
 
